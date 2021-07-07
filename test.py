@@ -1,20 +1,15 @@
 import os
 import threading
 import time
+from queue import Queue
 
 
-def test():
-    print(1)
+q = Queue(maxsize=0)
 
-thread = threading.Thread(target=test,
-                          args=()  # 元组
-                          )
-thread.start()
+q.put([82, 459])
+q.put([200, 462])
 
-time.sleep(1)
+cur = q.get()
+q.put(cur)
 
-while(thread.is_alive() == False):
-    print(test.__name__)
-
-print(3)
-
+print(q.queue)

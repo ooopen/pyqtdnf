@@ -3,6 +3,7 @@ import inspect
 import random
 import threading
 import time
+from queue import Queue
 from threading import Thread
 
 import null as null
@@ -27,6 +28,7 @@ class MainWindow(QWidget):
     spmSearchThread = null
     doBuyClickThread = null
     getMailThread = null
+    exchangeIdThread = null
 
     currentThread = null
 
@@ -34,7 +36,7 @@ class MainWindow(QWidget):
 
     # 界面配置信息，先写死
 
-    ob = [{"name": "无色小晶块", "min": 10, "buyPrice": 48, "sellPrice": 52}]  # min:分钟
+    ob = [{"name": "无色小晶块", "min": 10, "buyPrice": 48, "sellPrice": 50}]  # min:分钟
 
     def __init__(self):
         super().__init__()
@@ -51,7 +53,7 @@ class MainWindow(QWidget):
         self.hk_stop.register(('control', 'f10'), callback=lambda x: self.stop("admin"))
         self.hk_stop.register(('control', 'f9'), callback=lambda x: self.start())
 
-        self.currentItem = self.ob[0]
+        self.currentItem = self.ob[0]  # 当前物品
 
         gl._init()
 
@@ -60,7 +62,7 @@ class MainWindow(QWidget):
     def testCurrent(self):
         gl.set_value("currentThreadTarget", 1)  # 开启当前调试线程
         self.currentThread = self.runThread(self.currentThread, lambda: self.currentThreadTarget(self.currentItem),
-                                            "spmSearchThread")
+                                            "currentThread")
 
     def start(self):
         print("start")
@@ -80,10 +82,12 @@ class MainWindow(QWidget):
                                                "doBuyClickThread")
         self.getMailThread = self.runThread(self.getMailThread, self.getMailThreadTarget, "getMailThread")
 
-
+        self.exchangeIdThread = self.runThread(self.exchangeIdThread,
+                                               lambda: self.exchangeIdThreadTarget(self.currentItem),
+                                               "exchangeIdThread")
 
     def loginThreadTarget(self):
-        self.threadTarget(self.model.login, "loginThreadTarget", True, ["spmPreThreadTarget"])
+        self.threadTarget(self.model.login, "loginThreadTarget", True, ["getMailThreadTarget"])
 
     def spmPreThreadTarget(self, item):
         self.threadTarget(self.model.spmhPre, "spmPreThreadTarget", True,
@@ -98,8 +102,11 @@ class MainWindow(QWidget):
     def getMailThreadTarget(self):
         self.threadTarget(self.model.getMail, "getMailThreadTarget", True, ["spmPreThreadTarget"])
 
+    def exchangeIdThreadTarget(self, item):
+        self.threadTarget(self.model.exchangeId, "exchangeIdThreadTarget", True, ["spmPreThreadTarget"], item)
+
     def currentThreadTarget(self, item):
-        self.threadTarget(self.model.upSell, "currentThreadTarget", True, [], item)
+        self.threadTarget(self.model.current, "currentThreadTarget", True, [], item)
 
     def demonThreadTarget(self):
         print("demonThreadTarget")
@@ -113,7 +120,17 @@ class MainWindow(QWidget):
                 gl.set_value("loginThreadTarget", 1)
 
                 self.start()
-            times = tbegin + self.currentItem['min'] * 60
+
+            if (gl.get_value("jbIsNotEnoughError") == 1):  # 金币不足
+                print("jbIsNotEnoughError")
+                self.stop()
+                gl._init()
+
+                gl.set_value("exchangeIdThreadTarget", 1)
+
+                self.start()
+
+            times = tbegin + self.currentItem['min'] * 60  # 收邮件的时间间隔
 
             if (times < int(time.time()) and int(time.time()) - times < 3 and gl.get_value(
                     "getMailThreadTarget:ing") == 0):
@@ -131,17 +148,16 @@ class MainWindow(QWidget):
         print("stop")
         if (items == null):
             items = [self.loginThread, self.spmPreThread, self.spmSearchThread, self.doBuyClickThread,
-                     self.getMailThread]
+                     self.getMailThread, self.currentThread]
         if (items == "admin"):
             items = [self.loginThread, self.spmPreThread, self.spmSearchThread, self.doBuyClickThread,
-                     self.getMailThread, self.demonThread]
+                     self.getMailThread, self.currentThread, self.demonThread]
 
         for i in items:
             print(i)
             if (i != null and i.is_alive()):
                 self._async_raise(i.ident, SystemExit)
         time.sleep(1)
-
 
     def runThread(self, thread, target, threadName):
 

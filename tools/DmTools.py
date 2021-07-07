@@ -4,6 +4,8 @@ import time
 
 from win32com.client import Dispatch
 
+import GlobalVar as gl
+
 
 def noRegsvrVip():
     dm_path = os.path.abspath(os.path.dirname(__file__)) + "/../7.2107"
@@ -62,7 +64,7 @@ def clickPic(dm, img, num=10, iskill=1, x1=0, y1=0, x2=1200, y2=800):
             time.sleep(0.01)
     print(time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + img)
     if (iskill == 1):
-        exit(1)
+        myexit(1)
 
 
 def findPic(dm, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800):
@@ -78,13 +80,14 @@ def findPic(dm, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800):
             time.sleep(0.01)
     print(time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + img)
     if (iskill == 1):
-        exit(1)
+        myexit(1)
     return ret
+
 
 def ocrDj(dm):
     i = 0
     while (i < 100):
-        ret = dm.Ocr(503,137,621,150, "ffffff-000000", 0.9)
+        ret = dm.Ocr(503, 137, 621, 150, "ffffff-000000", 0.9)
         if ("" != ret):
             return ret
         else:
@@ -96,13 +99,26 @@ def ocrDj(dm):
 def ocrsellDj(dm):
     i = 0
     while (i < 100):
-        ret = dm.Ocr(325,458,380,485, "ffffff-000000", 0.9)
+        ret = dm.Ocr(325, 458, 380, 485, "ffffff-000000", 0.9)
         if ("" != ret):
             return ret
         else:
             i = i + 1
             time.sleep(0.01)
     return -1
+
+
+def ocrJb(dm):
+    i = 0
+    while (i < 100):
+        ret = dm.Ocr(717, 545, 797, 557, "ddc593-020204", 0.9)
+        if ("" != ret):
+            return ret
+        else:
+            i = i + 1
+            time.sleep(0.01)
+    return -1
+
 
 def ocr2(dm):
     i = 0
@@ -136,8 +152,9 @@ def FindWindow(dm, title, num=20, iskill=1):
             time.sleep(1)
     print(time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + title)
     if (iskill == 1):
-        exit(1)
+        myexit(1)
     return 0
+
 
 def MoveTo(dm, x, y):
     dm.MoveTo(x, y)
@@ -167,4 +184,4 @@ def SendString(dm, str):
 
 def myexit(code):
     print(code)
-    exit()
+    gl.set_value("doBuyClickThreadError", 1)
