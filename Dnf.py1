@@ -1,0 +1,170 @@
+import ctypes
+import inspect
+import random
+import threading
+import time
+from threading import Thread
+
+import null as null
+from PyQt5 import QtCore
+from PyQt5.QtCore import pyqtSignal, Qt, QTimer
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication, QWidget, QSystemTrayIcon, QMenu, QAction
+from system_hotkey import SystemHotkey
+
+from service.DnfModel import DnfModel
+from ui.main1 import Ui_Form
+
+
+class MainWindow(QWidget):
+    currentItem = null
+
+    loginThread = null  # 点击确定线程
+    thread2 = null  # 够买线程
+    thread3 = null  # 收邮件线程
+
+    getMailTimes = 60 * 10  # 收邮件和上架的间隔（秒）
+
+    # 界面配置信息，先写死
+
+    ob = [{"name": "无色小晶块", "min": 1, "buyPrice": 49, "sellPrice": 52}]  # min:分钟
+
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
+        self.model = DnfModel()
+
+        str = "string"
+
+        self.ui.pushButton.clicked.connect(lambda: self.start())
+        self.ui.pushButton_2.clicked.connect(self.testCurrent)
+
+        self.hk_stop = SystemHotkey()
+        self.hk_stop.register(('control', 'f10'), callback=lambda x: self.stopThread("stop"))
+        self.hk_stop.register(('control', 'f9'), callback=lambda x: self.startThread("start"))
+
+        self.currentItem = self.ob[0]
+
+    def start(self):
+        print("start")
+
+    def loginThreadTarget(self):
+        self.model.login()
+
+    def spmPreThreadTarget(self):
+        self.model.spmhPre(self.currentItem)
+
+    def spmDoThreadTarget(self):
+        tbegin = int(time.time())
+        while (tbegin + self.currentItem['min'] * 60 > int(time.time())):
+            self.model.spmDo(self.currentItem)
+
+
+    def startThread(self, str):
+
+        # 开启定时器线程
+
+        self.thread3 = threading.Timer(self.getMailTimes, self.doGetMail)
+        self.thread3.start()
+
+        if (self.thread != null or self.thread.is_alive()):
+            return  # 不重复开启线程
+
+        self.thread = Thread(target=self.threadSend,
+                             args=()  # 元组
+                             )
+        self.thread.start()
+
+    def stopThread(self, str, items=null):  # 停止子线程
+        print(str)
+
+        if (items == null):
+            items = [self.thread, self.thread2, self.thread3]
+
+        for i in items:
+            print(i)
+            if (i != null and i.is_alive()):
+                self._async_raise(i.ident, SystemExit)
+
+    def threadSend(self):  # 开启子线程，不阻塞主线程
+
+        self.model.login()
+        time.sleep(1)
+
+        for item in self.ob:
+            self.model.spmhPre(item)
+
+            # 根据商品开启抢购点击线程
+            self.buyClick(item)
+
+            print("begin" + time.strftime("%H:%M:%S", time.localtime()))
+            for i in range(item['times'] * 16):
+                self.model.spmDo(item)
+
+            # 杀死点击线程
+            self.stopThread(item, [self.thread2])
+
+            print("end" + time.strftime("%H:%M:%S", time.localtime()))
+        print("扫拍已结束")
+
+    def buyClick(self, item):
+        if (self.thread2 != null and self.thread2.is_alive()):
+            return  # 不重复开启线程
+        self.thread2 = Thread(target=self.doBuyClick,
+                              args=(item,)  # 元组
+                              )
+        self.thread2.start()
+
+    def doBuyClick(self, item):
+
+        while (1):
+            self.model.bugclick(item)
+        print("doBuyClick stop")
+
+    def doGetMail(self):
+        print("收邮件")
+        self.stopThread("stop", [self.thread, self.thread2])
+
+        self.model.getMail()
+        # self.model.upSell(self.ob[0])
+
+        self.startThread("start")  # 恢复线程
+
+        self.thread3 = threading.Timer(self.getMailTimes, self.doGetMail)
+        self.thread3.start()
+
+    def testCurrent(self):
+        thread = Thread(target=self.model.current,
+                        args=()  # 元组
+                        )
+        thread.start()
+
+    def runThread(self, thread, target):
+
+        if (thread != null or thread.is_alive()):
+            return  # 不重复开启线程
+        thread = Thread(target=target,
+                        args=()  # 元组
+                        )
+        thread.start()
+
+    def _async_raise(self, tid, exctype):
+        """Raises an exception in the threads with id tid"""
+        if not inspect.isclass(exctype):
+            raise TypeError("Only types can be raised (not instances)")
+        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(tid), ctypes.py_object(exctype))
+        if res == 0:
+            raise ValueError("invalid thread id")
+        elif res != 1:
+            # """if it returns a number greater than one, you're in trouble,
+            # and you should call it again with exc=NULL to revert the effect"""
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, None)
+            raise SystemError("PyThreadState_SetAsyncExc failed")
+
+
+app = QApplication([])
+stats = MainWindow()
+stats.show()
+app.exec_()
