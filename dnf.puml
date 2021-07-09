@@ -1,0 +1,44 @@
+@startuml
+
+start
+
+
+
+
+  :init(gwindow);
+  :login;
+  :gmailx2;
+
+
+  repeat:spmpre;
+      if(jb < 50w?) then (yes)
+
+        if(sell out) then (yes)
+            :upself;
+        else (no)
+        endif
+        :exchangeId;
+        break
+     else(no)
+     :spmx10min;
+
+     endif
+
+  repeat while(spm error);
+
+
+
+stop
+
+
+start
+
+:killGwindow;
+:changeWgId;
+
+
+
+stop
+
+
+@enduml

@@ -28,6 +28,7 @@ class MainWindow(QWidget):
     spmSearchThread = null
     doBuyClickThread = null
     getMailThread = null
+    exchangeRoleThread = null
     exchangeIdThread = null
 
     currentThread = null
@@ -35,8 +36,6 @@ class MainWindow(QWidget):
     getMailTimes = 60 * 10  # 收邮件和上架的间隔（秒）
 
     # 界面配置信息，先写死
-
-    ob = [{"name": "无色小晶块", "min": 10, "buyPrice": 48, "sellPrice": 50}]  # min:分钟
 
     def __init__(self):
         super().__init__()
@@ -46,14 +45,14 @@ class MainWindow(QWidget):
 
         self.model = DnfModel()
 
-        self.ui.pushButton.clicked.connect(lambda: self.start())
+        self.ui.pushButton.clicked.connect(lambda: self.start("admin"))
         self.ui.pushButton_2.clicked.connect(self.testCurrent)
 
         self.hk_stop = SystemHotkey()
         self.hk_stop.register(('control', 'f10'), callback=lambda x: self.stop("admin"))
-        self.hk_stop.register(('control', 'f9'), callback=lambda x: self.start())
+        self.hk_stop.register(('control', 'f9'), callback=lambda x: self.start("admin"))
 
-        self.currentItem = self.ob[0]  # 当前物品
+        self.currentItem = None  # 此变量已经废弃
 
         gl._init()
 
@@ -64,8 +63,11 @@ class MainWindow(QWidget):
         self.currentThread = self.runThread(self.currentThread, lambda: self.currentThreadTarget(self.currentItem),
                                             "currentThread")
 
-    def start(self):
+    def start(self, admin=None):
         print("start")
+
+        if (admin == "admin"):
+            gl.set_value("loginThreadTarget", 1)  # 默认从登陆开启
 
         self.demonThread = self.runThread(self.demonThread, self.demonThreadTarget, "demonThread")
 
@@ -82,6 +84,9 @@ class MainWindow(QWidget):
                                                "doBuyClickThread")
         self.getMailThread = self.runThread(self.getMailThread, self.getMailThreadTarget, "getMailThread")
 
+        # self.exchangeRoleThread = self.runThread(self.exchangeRoleThread,
+        #                                        lambda: self.exchangeRoleThreadTarget(self.currentItem),
+        #                                        "exchangeRoleThread")
         self.exchangeIdThread = self.runThread(self.exchangeIdThread,
                                                lambda: self.exchangeIdThreadTarget(self.currentItem),
                                                "exchangeIdThread")
@@ -101,6 +106,9 @@ class MainWindow(QWidget):
 
     def getMailThreadTarget(self):
         self.threadTarget(self.model.getMail, "getMailThreadTarget", True, ["spmPreThreadTarget"])
+
+    def exchangeRoleThreadTarget(self, item):
+        self.threadTarget(self.model.exchangeRole, "exchangeRoleThreadTarget", True, ["spmPreThreadTarget"], item)
 
     def exchangeIdThreadTarget(self, item):
         self.threadTarget(self.model.exchangeId, "exchangeIdThreadTarget", True, ["spmPreThreadTarget"], item)
@@ -130,7 +138,7 @@ class MainWindow(QWidget):
 
                 self.start()
 
-            times = tbegin + self.currentItem['min'] * 60  # 收邮件的时间间隔
+            times = tbegin + 10 * 60  # 收邮件的时间间隔
 
             if (times < int(time.time()) and int(time.time()) - times < 3 and gl.get_value(
                     "getMailThreadTarget:ing") == 0):
@@ -148,10 +156,10 @@ class MainWindow(QWidget):
         print("stop")
         if (items == null):
             items = [self.loginThread, self.spmPreThread, self.spmSearchThread, self.doBuyClickThread,
-                     self.getMailThread, self.currentThread]
+                     self.getMailThread, self.currentThread, self.exchangeIdThread]
         if (items == "admin"):
             items = [self.loginThread, self.spmPreThread, self.spmSearchThread, self.doBuyClickThread,
-                     self.getMailThread, self.currentThread, self.demonThread]
+                     self.getMailThread, self.currentThread, self.exchangeIdThread, self.demonThread]
 
         for i in items:
             print(i)
