@@ -30,6 +30,7 @@ class MainWindow(QWidget):
     getMailThread = null
     exchangeRoleThread = null
     exchangeIdThread = null
+    beforeExchangeIdThread = null
 
     currentThread = null
 
@@ -87,6 +88,9 @@ class MainWindow(QWidget):
         # self.exchangeRoleThread = self.runThread(self.exchangeRoleThread,
         #                                        lambda: self.exchangeRoleThreadTarget(self.currentItem),
         #                                        "exchangeRoleThread")
+        self.beforeExchangeIdThread = self.runThread(self.beforeExchangeIdThread,
+                                                     lambda: self.beforeExchangeIdThreadTarget(self.currentItem),
+                                                     "beforeExchangeIdThread")
         self.exchangeIdThread = self.runThread(self.exchangeIdThread,
                                                lambda: self.exchangeIdThreadTarget(self.currentItem),
                                                "exchangeIdThread")
@@ -109,6 +113,10 @@ class MainWindow(QWidget):
 
     def exchangeRoleThreadTarget(self, item):
         self.threadTarget(self.model.exchangeRole, "exchangeRoleThreadTarget", True, ["spmPreThreadTarget"], item)
+
+    def beforeExchangeIdThreadTarget(self, item):
+        self.threadTarget(self.model.beforeExchangeId, "beforeExchangeIdThreadTarget", True, ["exchangeIdThreadTarget"],
+                          item)
 
     def exchangeIdThreadTarget(self, item):
         self.threadTarget(self.model.exchangeId, "exchangeIdThreadTarget", True, ["spmPreThreadTarget"], item)
@@ -134,32 +142,27 @@ class MainWindow(QWidget):
                 self.stop()
                 gl._init()
 
+                gl.set_value("beforeExchangeIdThreadTarget", 1)
+
+                self.start()
+            if (gl.get_value("networkError") == 1):  # 网络错误，直接换角色
+                print("networkError")
+                self.stop()
+                gl._init()
+
                 gl.set_value("exchangeIdThreadTarget", 1)
 
                 self.start()
-
-            times = tbegin + 10 * 60  # 收邮件的时间间隔
-
-            if (times < int(time.time()) and int(time.time()) - times < 3 and gl.get_value(
-                    "getMailThreadTarget:ing") == 0):
-                print("getMail")
-                self.stop()
-                gl._init()
-                gl.set_value("getMailThreadTarget", 1)
-                gl.set_value("getMailThreadTarget:ing", 1)  # #标识这个业务正在进行中
-
-                self.start()
-
-            time.sleep(0.1)
 
     def stop(self, items=null):  # 停止子线程
         print("stop")
         if (items == null):
             items = [self.loginThread, self.spmPreThread, self.spmSearchThread, self.doBuyClickThread,
-                     self.getMailThread, self.currentThread, self.exchangeIdThread]
+                     self.getMailThread, self.currentThread, self.exchangeIdThread, self.beforeExchangeIdThread]
         if (items == "admin"):
             items = [self.loginThread, self.spmPreThread, self.spmSearchThread, self.doBuyClickThread,
-                     self.getMailThread, self.currentThread, self.exchangeIdThread, self.demonThread]
+                     self.getMailThread, self.currentThread, self.exchangeIdThread, self.beforeExchangeIdThread,
+                     self.demonThread]
 
         for i in items:
             print(i)

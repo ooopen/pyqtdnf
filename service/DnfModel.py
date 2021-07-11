@@ -12,9 +12,10 @@ import GlobalVar as gl
 
 class DnfModel():
     dm = None
+
     currentItem = None
     ob110 = [{"name": "无色小晶块", "min": 10, "buyPrice": 47, "sellPrice": 49}]  # min:分钟
-    ob390 = [{"name": "无色小晶块", "min": 10, "buyPrice": 56, "sellPrice": 58}]  # min:分钟
+    ob390 = [{"name": "无色小晶块", "min": 10, "buyPrice": 55, "sellPrice": 57}]  # min:分钟
 
     def __init__(self):
         self.dm = noRegsvr()
@@ -29,7 +30,8 @@ class DnfModel():
             time.sleep(1)
 
     def current(self, item):
-        self.initWindow()
+        ret = self.upSell(item)
+        print(ret)
 
     def exchangeRole(self, item):
         self.clear()
@@ -51,22 +53,44 @@ class DnfModel():
         time.sleep(5)
         findPic(self.dm, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
 
+    def beforeExchangeId(self, item):
+        # 先收邮件
+        self.getMail(item)
+        if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行
+            self.dm.KeyPress(76)
+            time.sleep(1)
+
+        ret = ocrJb(self.dm)  # 检查金币数量，金币不足上架
+        if (ret != -1 and int(ret) > 5000000):
+            print("金币充足，继续扫拍")
+            gl.set_value("spmPreThreadTarget", 1)
+            return
+        self.upSell(item)  # 换角色之前上架一波
+        gl.set_value("exchangeIdThreadTarget", 1)
+
     def exchangeId(self, item):
+
         hd = FindWindow(self.dm, "WeGame", 2, 0)
         if (hd == 0):
             win32process.CreateProcess('D:\\Program Files (x86)\\WeGame\\wegame.exe', '', None, None, 0,
                                        win32process.CREATE_NO_WINDOW,
                                        None, None, win32process.STARTUPINFO())
-            time.sleep(3)
+            time.sleep(5)
 
         self.initWindow("WeGame", 15, 1)
-        MoveTo(self.dm, 541, 45)  # 回到主页
-        LeftClick(self.dm)
-        time.sleep(1)
-        MoveTo(self.dm, 105, 209)
-        LeftClick(self.dm)
+        ret = findPic(self.dm, "dnfimg/wg首页.bmp", 200, 0, 0, 0, 1300, 1200)
+        if (ret[0] == 0):
+            MoveTo(self.dm, ret[1], ret[2])
+            LeftClick(self.dm)
+            time.sleep(1)
 
-        if (findPic(self.dm, "dnfimg/id110.bmp", 300, 0, 1044, 18, 1142, 100)[0] == 0):
+            ret = findPic(self.dm, "dnfimg/wg地下城.bmp", 200, 0, 0, 0, 1300, 1200)
+            if (ret[0] == 0):
+                MoveTo(self.dm, ret[1], ret[2])
+                LeftClick(self.dm)
+                time.sleep(1)
+
+        if (findPic(self.dm, "dnfimg/id110.bmp", 300, 0, 1044, 18, 1142, 100)[0] == 0):  # 当前角色
 
             id = "110"
         elif (findPic(self.dm, "dnfimg/id390.bmp", 300, 0, 1044, 18, 1142, 100)[0] == 0):
@@ -74,7 +98,7 @@ class DnfModel():
         else:
             id = None
         print("id" + id)
-
+        time.sleep(1)
         clickPic(self.dm, "dnfimg/关闭应用1.bmp", 100, 0, 1198, 747, 1286, 839)
         time.sleep(1)
         clickPic(self.dm, "dnfimg/关闭应用2.bmp", 100, 0, 1001, 693, 1139, 752)
@@ -104,11 +128,12 @@ class DnfModel():
         self.initWindow("WeGame")
         clickPic(self.dm, "dnfimg/wg首页.bmp", 200, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/wg地下城.bmp", 200, 0, 0, 0, 1300, 1200)
+        clickPic(self.dm, "dnfimg/协议.bmp", 200, 1, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/启动.bmp", 200, 1, 0, 0, 1300, 1200)
         time.sleep(30)
         self.initWindow("地下城与勇士", 30)
         clickPic(self.dm, "dnfimg/游戏开始.bmp", 2000)
-        time.sleep(50)
+        time.sleep(70)
         findPic(self.dm, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
 
     def login(self, data):
@@ -130,23 +155,32 @@ class DnfModel():
             time.sleep(3)
 
         self.initWindow("WeGame", 10, 1)
-        ret = findPic(self.dm, "dnfimg/390-1.bmp", 200, 0, 613, 160, 868, 394)  # 防止没有默认账号，界面不一样
+
+        ret = findPic(self.dm, "dnfimg/qqlogin.bmp", 50, 0, 576, 212, 933, 471)  # qq登录
+        if (ret[0] == 0):
+            MoveTo(self.dm, 750, 369)
+            time.sleep(0.1)
+            LeftClick(self.dm)
+            time.sleep(1)
+
+        ret = findPic(self.dm, "dnfimg/390-1.bmp", 10, 0, 613, 160, 868, 394)  # 防止没有默认账号，界面不一样
         if (ret[0] == 0):
             MoveTo(self.dm, ret[1], ret[2])
             LeftClick(self.dm)
             time.sleep(2)
+            self.initWindow("WeGame", 10, 1)
 
-        ret = findPic(self.dm, "dnfimg/wg首页.bmp", 200, 0, 0, 0, 1300, 1200)
+        ret = findPic(self.dm, "dnfimg/wg首页.bmp", 80, 0, 0, 0, 1300, 1200)
         if (ret[0] == 0):
             MoveTo(self.dm, ret[1], ret[2])
             LeftClick(self.dm)
             time.sleep(1)
 
-        ret = findPic(self.dm, "dnfimg/wg地下城.bmp", 200, 0, 0, 0, 1300, 1200)
-        if (ret[0] == 0):
-            MoveTo(self.dm, ret[1], ret[2])
-            LeftClick(self.dm)
-            time.sleep(1)
+            ret = findPic(self.dm, "dnfimg/wg地下城.bmp", 200, 0, 0, 0, 1300, 1200)
+            if (ret[0] == 0):
+                MoveTo(self.dm, ret[1], ret[2])
+                LeftClick(self.dm)
+                time.sleep(1)
 
         if (findPic(self.dm, "dnfimg/id110.bmp", 10, 0, 1044, 18, 1142, 100)[0] == 0):
 
@@ -169,6 +203,7 @@ class DnfModel():
             self.currentItem = self.ob390[0]
         elif (findPic(self.dm, "dnfimg/神的.bmp", 10, 0, 156, 204, 344, 303)[0] == 0):
             self.currentItem = self.ob110[0]
+        time.sleep(40)
 
     def clear(self):
         self.initWindow()
@@ -185,21 +220,22 @@ class DnfModel():
         if (item == None):
             myexit("currentItem为None")
         self.clear()
+
+        # 换武器检查是否死机
+        color1 = self.dm.GetColor(16, 583)
+        self.dm.KeyPress(49)
+        time.sleep(2)
+        color2 = self.dm.GetColor(16, 583)
+        if (color1 == color2):
+            print("网络错误，换角色")
+            gl.set_value("networkError", 1)
+
+        else:
+            print("换武器ok")
+
         if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
             self.dm.KeyPress(76)
             time.sleep(1)
-
-        ret = ocrJb(self.dm)  # 检查金币数量，金币不足上架，换角色
-        if (ret != -1 and int(ret) < 500000):
-
-            # 判断是否要上架
-            MoveTo(self.dm, 118, 66)
-            LeftClick(self.dm)
-            if (findPic(self.dm, "dnfimg/无色.bmp", 100, 0, 141, 104, 234, 515)[0] != 0):  # 如果没有上架，则上架在换角色
-                self.upSell(item)
-
-            gl.set_value("jbIsNotEnoughError", 1)
-            print(1)
 
         MoveTo(self.dm, 43, 67)  # 点击物品搜索tab
         LeftClick(self.dm)
@@ -244,24 +280,27 @@ class DnfModel():
             for i in range(2):
                 LeftClick(self.dm)
                 time.sleep(0.01)
-            time.sleep(2)
             MoveTo(self.dm, 595, 141)  # 移回到价格tip
+            ret = ocrJb(self.dm)  # 检查金币数量，金币不足上架，换角色
+
+            if (ret != -1 and int(ret) < 5000000):
+                gl.set_value("jbIsNotEnoughError", 1)  # 金币不足触发换角色判断
+        ret = self.dm.GetCursorPos()
+        if (ret[1] != 595):
+            self.dm.MoveTo(595, 141)  # 移回到价格tip
+
         if (ret == -1):
             gl.set_value("doBuyClickThreadError", 1)
             print(1)
 
     def getMail(self, data):
         self.clear()
-        if (findPic(self.dm, "dnfimg/邮件.bmp", 10, 0, 575, 447, 777, 547)[0] == 0):  # 如果有邮件
-            clickPic(self.dm, "dnfimg/邮件.bmp", 10, 0, 575, 447, 777, 547)
-            clickPic(self.dm, "dnfimg/选择接收.bmp", 19, 0, 232, 433, 348, 494)
-            time.sleep(1)
-            self.dm.KeyPress(27)  # 重置一下
-        if (findPic(self.dm, "dnfimg/邮件.bmp", 10, 0, 575, 447, 777, 547)[0] == 0):  # 如果还有邮件
-            clickPic(self.dm, "dnfimg/邮件.bmp", 10, 0, 575, 447, 777, 547)
-            clickPic(self.dm, "dnfimg/选择接收.bmp", 10, 0, 232, 433, 348, 494)
-            time.sleep(1)
-            self.dm.KeyPress(27)  # 重置一下
+        for i in range(5):
+            if (findPic(self.dm, "dnfimg/邮件.bmp", 10, 0, 575, 447, 777, 547)[0] == 0):  # 如果有邮件
+                clickPic(self.dm, "dnfimg/邮件.bmp", 5, 0, 575, 447, 777, 547)
+                clickPic(self.dm, "dnfimg/选择接收.bmp", 5, 0, 232, 433, 348, 494)
+                time.sleep(0.5)
+                self.dm.KeyPress(27)  # 重置一下
 
     def upSell(self, item):
         item = self.currentItem
@@ -271,8 +310,18 @@ class DnfModel():
         if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
             self.dm.KeyPress(76)
             time.sleep(1)
+
         clickPic(self.dm, "dnfimg/上架拍卖品.bmp", 100, 0, 0, 508, 117, 591)
-        ret = findPic(self.dm, "dnfimg/无色.bmp", 10, 0, 728, 371, 769, 396)
+        time.sleep(1)
+
+        ret = findPic(self.dm, "dnfimg/装备栏.bmp", 100, 0, 401,0,710,170)
+        if (ret[0] == 0):  # 为了点击材料栏
+            MoveTo(self.dm, ret[1] + 25, ret[2] + 239)  # 点击材料栏
+            time.sleep(0.1)
+            LeftClick(self.dm)
+            time.sleep(0.1)
+
+        ret = findPic(self.dm, "dnfimg/无色.bmp", 100, 0, 698, 312, 803, 470)
         if (ret[0] == 0):  #
             MoveTo(self.dm, ret[1], ret[2])
             LeftDown(self.dm)
@@ -294,7 +343,7 @@ class DnfModel():
                     LeftClick(self.dm)
                     MoveTo(self.dm, 372, 508)
                     LeftClick(self.dm)  # 48小时
-                    # clickPic(self.dm, "dnfimg/开始排名.bmp", 100, 0, 249, 560, 339, 596)
+                    clickPic(self.dm, "dnfimg/开始排名.bmp", 100, 0, 249, 560, 339, 596)
 
         time.sleep(0.1)
         self.dm.KeyPress(27)  # 重置一下
