@@ -3,13 +3,10 @@ import threading
 import time
 from queue import Queue
 
+t1 = time.time()
 
-q = Queue(maxsize=0)
+t2  = time.strftime("%M", time.localtime())
 
-q.put([82, 459])
-q.put([200, 462])
-
-cur = q.get()
-q.put(cur)
-
-print(q.queue)
+t2 = 10
+print(t2)
+print(int(t2)%10)

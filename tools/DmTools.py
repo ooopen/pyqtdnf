@@ -62,7 +62,6 @@ def clickPic(dm, img, num=10, iskill=1, x1=0, y1=0, x2=1200, y2=800):
             return
         else:
             i = i + 1
-            time.sleep(0.01)
     print(time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + img)
     if (iskill == 1):
         myexit(1)
@@ -88,12 +87,11 @@ def findPic(dm, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800):
 def ocrDj(dm):
     i = 0
     while (i < 100):
-        ret = dm.Ocr(503, 137, 621, 150, "ffffff-000000", 0.9)
+        ret = dm.Ocr(530,138,542,147, "ffffff-000000", 1)
         if ("" != ret):
             return ret
         else:
             i = i + 1
-            time.sleep(0.01)
     return -1
 
 
@@ -185,4 +183,4 @@ def SendString(dm, str):
 
 def myexit(code):
     print(code)
-    gl.set_value("doBuyClickThreadError", 1)
+    #gl.set_value("doBuyClickThreadError", 1)

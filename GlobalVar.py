@@ -8,6 +8,7 @@ def _init():
 
 
 def set_value(name, value):
+    global _global_dict
     _global_dict[name] = value
 
 

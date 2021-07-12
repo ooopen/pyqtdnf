@@ -60,9 +60,9 @@ class MainWindow(QWidget):
         gl.set_value("loginThreadTarget", 1)  # 默认从登陆开启
 
     def testCurrent(self):
-        gl.set_value("currentThreadTarget", 1)  # 开启当前调试线程
         self.currentThread = self.runThread(self.currentThread, lambda: self.currentThreadTarget(self.currentItem),
                                             "currentThread")
+        gl.set_value("currentThreadTarget", 1)  # 开启当前调试线程
 
     def start(self, admin=None):
         print("start")
@@ -115,11 +115,10 @@ class MainWindow(QWidget):
         self.threadTarget(self.model.exchangeRole, "exchangeRoleThreadTarget", True, ["spmPreThreadTarget"], item)
 
     def beforeExchangeIdThreadTarget(self, item):
-        self.threadTarget(self.model.beforeExchangeId, "beforeExchangeIdThreadTarget", True, ["exchangeIdThreadTarget"],
-                          item)
+        self.threadTarget(self.model.beforeExchangeId, "beforeExchangeIdThreadTarget", True, [], item)
 
     def exchangeIdThreadTarget(self, item):
-        self.threadTarget(self.model.exchangeId, "exchangeIdThreadTarget", True, ["spmPreThreadTarget"], item)
+        self.threadTarget(self.model.exchangeId, "exchangeIdThreadTarget", True, ["loginThreadTarget"], item)
 
     def currentThreadTarget(self, item):
         self.threadTarget(self.model.current, "currentThreadTarget", True, [], item)
@@ -178,26 +177,21 @@ class MainWindow(QWidget):
                         args=()  # 元组
                         )
         thread.start()
-        print(threadName)
         return thread
 
     def threadTarget(self, func, sign, once=True, startSigns=[], data=null):
         # print(func.__name__)
+
         while (1):
             if (gl.get_value(sign) == 0):
                 time.sleep(1)
             else:
-
                 if (once):  # 只执行一次，关闭标识
                     gl.set_value(sign, 0)
                 # print(func.__name__)
                 func(data)  # 执行具体业务
-
                 for item in startSigns:  # 执行完毕，开启下一步线程
                     gl.set_value(item, 1)
-                time.sleep(0.001)
-
-                gl.set_value(sign + ":ing", 0)  # #标识这个业务已完成
 
     def _async_raise(self, tid, exctype):
         """Raises an exception in the threads with id tid"""
