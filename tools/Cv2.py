@@ -52,11 +52,11 @@ class SlideCrack(object):
         cv2.rectangle(target, tl, br, (0, 0, 255), 2)
         # 暂不输出
         cv2.imwrite("f.jpg", target)
-        return tl
+        return tl[0]
 
     @staticmethod
     def image_edge_detection(img):
-        edges = cv2.Canny(img, 100, 200)
+        edges = cv2.Canny(img, 150, 200)
         return edges
 
     def discern(self):

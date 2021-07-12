@@ -1,12 +1,10 @@
-import os
-import threading
-import time
-from queue import Queue
+arr = [[12],[3,4],[4,5]]
+arr.reverse()
+print(arr)
 
-t1 = time.time()
+a=[175,164,169,180,171,178,165,174]
+b = 0
+for i in a:
+    b=b+i
 
-t2  = time.strftime("%M", time.localtime())
-
-t2 = 10
-print(t2)
-print(int(t2)%10)
+print(b/8)

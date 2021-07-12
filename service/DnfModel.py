@@ -6,6 +6,7 @@ import win32process
 from win32com.client import Dispatch
 
 from tools import dm
+from tools.Cv2 import SlideCrack
 from tools.DmTools import *
 import GlobalVar as gl
 
@@ -19,9 +20,9 @@ class DnfModel():
 
     def __init__(self):
         self.dm = noRegsvr()
+        # self.dm = noRegsvrVip()
         self.dm.SetKeypadDelay("normal", 1)
         self.dm.SetMouseDelay("normal", 1)
-        # self.dm2 = noRegsvr()l
 
     def initWindow(self, title="地下城与勇士", num=4, isKill=0):
 
@@ -32,25 +33,40 @@ class DnfModel():
             time.sleep(1)
 
     def current(self, item):
-        self.dm.SetKeypadDelay("normal", 0.1)
-        self.dm.SetMouseDelay("normal", 0.1)
+        self.initWindow("WeGame", 10, 1)
 
-        t = time.time()
-        self.dm.LeftClick()
-        print(time.time() - t)
+        for i in range(5):
+            ret = findPic(self.dm, "dnfimg/滑条.bmp", 50, 0, 0, 0, 941, 679)  # 切换qq
+            MoveTo(self.dm, ret[1], ret[2])
+            self.dm.LeftDown()
+            time.sleep(0.1)
+            MoveTo(self.dm, ret[1] + 170, ret[2])
+            time.sleep(0.1)
+            self.dm.LeftUp()
+            time.sleep(1)
+            ret = findPic(self.dm, "dnfimg/滑条err.bmp", 50, 0, 0, 0, 941, 679)  # 切换qq
+            if(ret[0] != 0):
+                print("找到了")
+                break
+            time.sleep(1)
+            MoveTo(self.dm,555,162)
+            time.sleep(0.1)
+            LeftClick(self.dm)
+            time.sleep(1)
 
-        t = time.time()
-        self.dm.MoveTo(595, 151)
-
-        print(time.time() - t)
-
-        t = time.time()
-        self.dm.KeyPress(13)
-        print(time.time() - t)
-        t = time.time()
-        self.dm.KeyPress(13)
-        print(time.time() - t)
-        t = time.time()
+        return
+        ret = findPic(self.dm, "dnfimg/切换qq号.bmp", 50, 0, 773, 178, 852, 238)  # 切换qq
+        if (ret[0] == 0):
+            MoveTo(self.dm, ret[1], ret[2])
+            time.sleep(0.1)
+            LeftClick(self.dm)
+            time.sleep(0.1)
+            MoveTo(self.dm, 739, 273)
+            LeftClick(self.dm)
+            time.sleep(0.1)
+            MoveTo(self.dm, 744, 327)
+            # LeftClick(self.dm)
+            # self.initWindow("WeGame", 10, 1)
 
     def exchangeRole(self, item):
         self.clear()
@@ -179,19 +195,19 @@ class DnfModel():
 
         self.initWindow("WeGame", 10, 1)
 
-        ret = findPic(self.dm, "dnfimg/qqlogin.bmp", 50, 0, 576, 212, 933, 471)  # qq登录
-        if (ret[0] == 0):
-            MoveTo(self.dm, 750, 369)
-            time.sleep(0.1)
-            LeftClick(self.dm)
-            time.sleep(1)
-
-        ret = findPic(self.dm, "dnfimg/390-1.bmp", 10, 0, 613, 160, 868, 394)  # 防止没有默认账号，界面不一样
-        if (ret[0] == 0):
-            MoveTo(self.dm, ret[1], ret[2])
-            LeftClick(self.dm)
-            time.sleep(2)
-            self.initWindow("WeGame", 10, 1)
+        # ret = findPic(self.dm, "dnfimg/qqlogin.bmp", 50, 0, 576, 212, 933, 471)  # qq登录
+        # if (ret[0] == 0):
+        #     MoveTo(self.dm, 750, 369)
+        #     time.sleep(0.1)
+        #     LeftClick(self.dm)
+        #     time.sleep(1)
+        #
+        # ret = findPic(self.dm, "dnfimg/390-1.bmp", 10, 0, 613, 160, 868, 394)  # 防止没有默认账号，界面不一样
+        # if (ret[0] == 0):
+        #     MoveTo(self.dm, ret[1], ret[2])
+        #     LeftClick(self.dm)
+        #     time.sleep(2)
+        #     self.initWindow("WeGame", 10, 1)
 
         ret = findPic(self.dm, "dnfimg/wg首页.bmp", 80, 0, 0, 0, 1300, 1200)
         if (ret[0] == 0):
