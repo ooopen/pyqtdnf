@@ -190,9 +190,11 @@ class DnfModel():
         self.initWindow("地下城与勇士", 30)
         time.sleep(1)
         clickPic(self.dm, "dnfimg/游戏开始.bmp", 2000)
+        time.sleep(1)
+        LeftClick(self.dm) #防止没点到开始
         time.sleep(10)
         findPic(self.dm, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
-        time.sleep(48)
+        time.sleep(45)
         # 准备扫拍
         gl._init()
         gl.set_value("spmPreThreadTarget", 1)

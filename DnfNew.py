@@ -106,7 +106,7 @@ class MainWindow(QWidget):
 
 
     def exchangeIdThreadTarget(self, item):
-        self.threadTarget(self.model.loginOrExchangeId, "exchangeIdThreadTarget", True, [], item)
+        self.threadTarget(self.model.loginOrExchangeId, "exchangeIdThreadTarget", True, [], "exchangeId")
 
     def currentThreadTarget(self, item):
         self.threadTarget(self.model.current, "currentThreadTarget", True, [], item)
