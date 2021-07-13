@@ -131,9 +131,9 @@ class DnfModel():
         # 启动游戏
         self.initWindow("WeGame", 4, 1)
         time.sleep(1)
-        clickPic(self.dm, "dnfimg/wg首页.bmp", 100, 1, 0, 0, 1300, 1200)
-        clickPic(self.dm, "dnfimg/wg地下城.bmp", 50, 1, 0, 0, 1300, 1200)
-        clickPic(self.dm, "dnfimg/协议.bmp", 50, 0, 1, 0, 1300, 1200)
+        clickPic(self.dm, "dnfimg/wg首页.bmp", 100, 0, 0, 0, 1300, 1200)
+        clickPic(self.dm, "dnfimg/wg地下城.bmp", 50, 0, 0, 0, 1300, 1200)
+        clickPic(self.dm, "dnfimg/协议.bmp", 50, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/启动.bmp", 50, 0, 1, 0, 1300, 1200)
         time.sleep(30)
         self.initWindow("地下城与勇士", 30)
