@@ -73,12 +73,12 @@ class SlideCrack(object):
         # 输出横坐标, 即 滑块在图片上的位置
         return x
 
-# 调用如下
-# if __name__ == "__main__":
-#     # 滑块图片
-#     image1 = "p.bmp"
-#     # 背景图片
-#     image2 = "s.bmp"
-#     sc = SlideCrack(image1, image2)
-#     a=sc.discern()
-#     print(a)
+#调用如下
+if __name__ == "__main__":
+    # 滑块图片
+    image1 = "p.bmp"
+    # 背景图片
+    image2 = "s.bmp"
+    sc = SlideCrack(image1, image2)
+    a=sc.discern()
+    print(a)

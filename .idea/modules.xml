@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Dnf.iml" filepath="$PROJECT_DIR$/Dnf.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pyqtdnf.iml" filepath="$PROJECT_DIR$/pyqtdnf.iml" />
     </modules>
   </component>
 </project>

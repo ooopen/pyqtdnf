@@ -46,6 +46,7 @@ class MainWindow(QWidget):
 
         self.model = DnfModel()
 
+        self.ui.pushButton_3.clicked.connect(lambda: self.start("restart"))
         self.ui.pushButton.clicked.connect(lambda: self.start("admin"))
         self.ui.pushButton_2.clicked.connect(self.testCurrent)
 
@@ -57,8 +58,6 @@ class MainWindow(QWidget):
 
         gl._init()
 
-        gl.set_value("loginThreadTarget", 1)  # 默认从登陆开启
-
     def testCurrent(self):
         self.currentThread = self.runThread(self.currentThread, lambda: self.currentThreadTarget(self.currentItem),
                                             "currentThread")
@@ -66,9 +65,10 @@ class MainWindow(QWidget):
 
     def start(self, admin=None):
         print("start")
-
+        if (admin == "restart"):
+            gl.set_value("loginThreadTarget", 1)  # 重启
         if (admin == "admin"):
-            gl.set_value("loginThreadTarget", 1)  # 默认从登陆开启
+            gl.set_value("spmPreThreadTarget", 1)  # 默认从扫拍开启
 
         self.demonThread = self.runThread(self.demonThread, self.demonThreadTarget, "demonThread")
 
@@ -85,22 +85,15 @@ class MainWindow(QWidget):
                                                "doBuyClickThread")
         self.getMailThread = self.runThread(self.getMailThread, self.getMailThreadTarget, "getMailThread")
 
-        # self.exchangeRoleThread = self.runThread(self.exchangeRoleThread,
-        #                                        lambda: self.exchangeRoleThreadTarget(self.currentItem),
-        #                                        "exchangeRoleThread")
-        self.beforeExchangeIdThread = self.runThread(self.beforeExchangeIdThread,
-                                                     lambda: self.beforeExchangeIdThreadTarget(self.currentItem),
-                                                     "beforeExchangeIdThread")
         self.exchangeIdThread = self.runThread(self.exchangeIdThread,
                                                lambda: self.exchangeIdThreadTarget(self.currentItem),
                                                "exchangeIdThread")
 
     def loginThreadTarget(self):
-        self.threadTarget(self.model.login, "loginThreadTarget", True, ["getMailThreadTarget"])
+        self.threadTarget(self.model.loginOrExchangeId, "loginThreadTarget", True, [], "login")
 
     def spmPreThreadTarget(self, item):
-        self.threadTarget(self.model.spmhPre, "spmPreThreadTarget", True,
-                          ["spmSearchThreadTarget", "doBuyClickThreadTarget"], item)
+        self.threadTarget(self.model.spmhPre, "spmPreThreadTarget", True, [], item)
 
     def spmSearchThreadTarget(self, item):
         self.threadTarget(self.model.spmSearch, "spmSearchThreadTarget", False, [], item)
@@ -109,47 +102,42 @@ class MainWindow(QWidget):
         self.threadTarget(self.model.doBuyClick, "doBuyClickThreadTarget", False, [], item)
 
     def getMailThreadTarget(self):
-        self.threadTarget(self.model.getMail, "getMailThreadTarget", True, ["spmPreThreadTarget"])
+        self.threadTarget(self.model.getMail, "getMailThreadTarget", True, [])
 
-    def exchangeRoleThreadTarget(self, item):
-        self.threadTarget(self.model.exchangeRole, "exchangeRoleThreadTarget", True, ["spmPreThreadTarget"], item)
-
-    def beforeExchangeIdThreadTarget(self, item):
-        self.threadTarget(self.model.beforeExchangeId, "beforeExchangeIdThreadTarget", True, [], item)
 
     def exchangeIdThreadTarget(self, item):
-        self.threadTarget(self.model.exchangeId, "exchangeIdThreadTarget", True, ["loginThreadTarget"], item)
+        self.threadTarget(self.model.loginOrExchangeId, "exchangeIdThreadTarget", True, [], item)
 
     def currentThreadTarget(self, item):
         self.threadTarget(self.model.current, "currentThreadTarget", True, [], item)
 
     def demonThreadTarget(self):
         print("demonThreadTarget")
-        tbegin = int(time.time())
         while (1):
             if (gl.get_value("doBuyClickThreadError") == 1):  # 扫拍异常修复
                 print("doBuyClickThreadError")
                 self.stop()
                 gl._init()
 
-                gl.set_value("loginThreadTarget", 1)
+                gl.set_value("spmPreThreadTarget", 1)
 
                 self.start()
 
-            if (gl.get_value("jbIsNotEnoughError") == 1):  # 金币不足
-                print("jbIsNotEnoughError")
+            if (gl.get_value("JbIsNotEnoughError") == 1):  # 换角色
+                print("JbIsNotEnoughError")
                 self.stop()
                 gl._init()
 
-                gl.set_value("beforeExchangeIdThreadTarget", 1)
+                gl.set_value("exchangeIdThreadTarget", 1)
 
                 self.start()
+
             if (gl.get_value("networkError") == 1):  # 网络错误，直接换角色
                 print("networkError")
                 self.stop()
                 gl._init()
 
-                gl.set_value("exchangeIdThreadTarget", 1)
+                gl.set_value("loginThreadTarget", 1)
 
                 self.start()
 

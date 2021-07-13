@@ -139,7 +139,7 @@ def grag(x1, y1, x2, y2):
     LeftUp()
 
 
-def FindWindow(dm, title, num=20, iskill=1):
+def FindWindow(dm, title, num=20, iskill=0):
     i = 0
     while (i < num):
         ret = dm.FindWindow("", title)
@@ -151,7 +151,7 @@ def FindWindow(dm, title, num=20, iskill=1):
             time.sleep(1)
     print(time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + title)
     if (iskill == 1):
-        myexit(1)
+        myexit("没有找到窗口"+title)
     return 0
 
 
@@ -183,4 +183,4 @@ def SendString(dm, str):
 
 def myexit(code):
     print(code)
-    # gl.set_value("doBuyClickThreadError", 1)
+    #gl.set_value("networkError", 1)
