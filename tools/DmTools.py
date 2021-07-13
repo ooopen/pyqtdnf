@@ -50,21 +50,21 @@ def regsvr():
     return dm_1
 
 
-def clickPic(dm, img, num=10, iskill=1, x1=0, y1=0, x2=1200, y2=800):
+def clickPic(dm, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800):
     i = 0
     MoveTo(dm, 0, 0)
     while (i < num):
         ret = dm.FindPic(x1, y1, x2, y2, img, "000000", 0.9, 0)
         if (-1 != ret[0]):
-            print(time.strftime("%H:%M:%S", time.localtime()) + " success find：" + img)
+            mylog(dm,time.strftime("%H:%M:%S", time.localtime()) + " success find：" + img)
             MoveTo(dm, ret[1], ret[2])
             LeftClick(dm)
             return
         else:
             i = i + 1
-    print(time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + img)
+    mylog(dm,time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + img)
     if (iskill == 1):
-        myexit(1)
+        myexit(dm,1)
 
 
 def findPic(dm, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800, color="000000"):
@@ -73,14 +73,14 @@ def findPic(dm, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800, color="00000
     while (i < num):
         ret = dm.FindPic(x1, y1, x2, y2, img, color, 0.9, 0)
         if (-1 != ret[0]):
-            print(time.strftime("%H:%M:%S", time.localtime()) + " success find：" + img)
+            mylog(dm,time.strftime("%H:%M:%S", time.localtime()) + " success find：" + img)
             return ret
         else:
             i = i + 1
             time.sleep(0.01)
-    print(time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + img)
+    mylog(dm,time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + img)
     if (iskill == 1):
-        myexit(1)
+        myexit(dm,1)
     return ret
 
 
@@ -144,14 +144,14 @@ def FindWindow(dm, title, num=20, iskill=0):
     while (i < num):
         ret = dm.FindWindow("", title)
         if (0 != ret):
-            print(time.strftime("%H:%M:%S", time.localtime()) + " success find：" + title)
+            mylog(dm,time.strftime("%H:%M:%S", time.localtime()) + " success find：" + title)
             return ret
         else:
             i = i + 1
             time.sleep(1)
-    print(time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + title)
+    mylog(dm,time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + title)
     if (iskill == 1):
-        myexit("没有找到窗口"+title)
+        myexit(dm,"没有找到窗口" + title)
     return 0
 
 
@@ -181,6 +181,13 @@ def SendString(dm, str):
     time.sleep(0.1)
 
 
-def myexit(code):
-    print(code)
-    #gl.set_value("networkError", 1)
+def mylog(dm, msg):
+    print(msg)
+    file = "runtime" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
+    msg = time.strftime("%H:%M:%S", time.localtime()) + ":" + str(msg)
+    dm.WriteFile("log/" + file, msg + "\r\n")
+
+
+def myexit(dm, code):
+    mylog(dm, code)
+    gl.set_value("networkError", 1)

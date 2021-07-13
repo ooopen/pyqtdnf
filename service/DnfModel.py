@@ -36,58 +36,7 @@ class DnfModel():
             time.sleep(1)
 
     def current(self, item):
-        # 关闭游戏
-        type = "exchangeId"
-        # 点击切换账号
-        self.initWindow("WeGame", 5, 1)
-        time.sleep(1)  # 点击wegame的切换账号
-        MoveTo(self.dm, 1094, 53)
-        LeftClick(self.dm)
-        MoveTo(self.dm, 1088, 281)
-        LeftClick(self.dm)
-        time.sleep(1)
-
-            # 登录界面
-        self.initWindow("WeGame", 10, 1)
-        ret = findPic(self.dm, "dnfimg/切换qq号.bmp", 500, 1, 773, 178, 852, 238)  # 找到登录界面
-
-        if (type == "exchangeId"):
-            MoveTo(self.dm, ret[1], ret[2])
-            time.sleep(0.1)
-            LeftClick(self.dm)
-            time.sleep(0.1)
-            MoveTo(self.dm, 739, 273)  # TODO 后续这里考虑做成动态的
-            LeftClick(self.dm)
-            time.sleep(0.1)
-        MoveTo(self.dm, 744, 327)
-        LeftClick(self.dm)  # 点击登录
-        time.sleep(1)
-
-        # 如果弹出滑动验证码，则处理
-        ret = findPic(self.dm, "dnfimg/滑条.bmp", 50, 0, 0, 0, 941, 679)
-        if (ret[0] == 0):
-            for i in range(8):
-                ret = findPic(self.dm, "dnfimg/滑条.bmp", 50, 0, 0, 0, 941, 679)
-                MoveTo(self.dm, ret[1], ret[2])
-                self.dm.LeftDown()
-                time.sleep(0.1)
-                MoveTo(self.dm, ret[1] + 170, ret[2])
-                time.sleep(0.1)
-                self.dm.LeftUp()
-                time.sleep(1)
-                ret = findPic(self.dm, "dnfimg/滑条err.bmp", 50, 0, 0, 0, 941, 679)
-                if (ret[0] != 0):
-                    break
-                time.sleep(1)
-                MoveTo(self.dm, 555, 162)  # 刷新验证码
-                time.sleep(0.1)
-                LeftClick(self.dm)
-                time.sleep(1)
-                if (i == 7):
-                    myexit("verification code is not auth")
-
-        time.sleep(3)
-        self.startGame()
+        self.dm.WriteFile("log.txt","哈哈哈\r\n")
 
 
 
@@ -173,7 +122,7 @@ class DnfModel():
                 LeftClick(self.dm)
                 time.sleep(1)
                 if (i == 7):
-                    myexit("verification code is not auth")
+                    myexit(self.dm,"verification code is not auth")
 
         time.sleep(3)
         self.startGame()
@@ -191,6 +140,7 @@ class DnfModel():
         time.sleep(1)
         clickPic(self.dm, "dnfimg/游戏开始.bmp", 2000)
         time.sleep(1)
+        MoveTo(self.dm,410,570)
         LeftClick(self.dm) #防止没点到开始
         time.sleep(10)
         findPic(self.dm, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
@@ -209,14 +159,14 @@ class DnfModel():
         for index in range(len(self.IDs)):
             if (findPic(self.dm, self.IDs[index]['idImg'], 10, 0, 156, 204, 344, 303)[0] == 0):
                 self.currentItem = self.IDs[index]
-                print(self.currentItem)
-                print("current id is " + self.IDs[index]['idImg'])
+                mylog(self.dm,self.currentItem)
+                mylog(self.dm,"current id is " + self.IDs[index]['idImg'])
                 break
             if (index + 1 == len(self.IDs)):
-                myexit("id is not found")
+                myexit(self.dm,"id is not found")
                 return
         if (self.currentItem == None):
-            myexit("currentItem为None")
+            myexit(self.dm,"currentItem为None")
 
         self.dm.KeyPress(77)  # 关闭角色信息
         time.sleep(0.5)
@@ -227,12 +177,12 @@ class DnfModel():
         #判断金币是否充足，否则换角色
         ret = ocrJb(self.dm)  # 检查金币数量，金币不足上架
         if (ret != -1 and int(ret) > 5000000):
-            print("金币充足，继续扫拍")
+            mylog(self.dm,"金币充足，继续扫拍")
             # 继续扫拍
         else:
             self.upSell(item)
             # 更换角色
-            print("金币不足")
+            mylog(self.dm,"金币不足")
             gl.set_value("JbIsNotEnoughError", 1)
             return
 
@@ -271,13 +221,13 @@ class DnfModel():
     def doBuyClick(self, item):
         item = self.currentItem
         if (item == None):
-            myexit("currentItem为None")
+            myexit(self.dm,"currentItem为None")
         t1 = time.time()
         ret = ocrDj(self.dm)
 
         # 如果检测到物品价格低于预设，
         if (ret != -1 and int(ret) <= item['buyPrice']):
-            # print("识别耗时："+str(time.time()-t1))
+            # mylog(self.dm,"识别耗时："+str(time.time()-t1))
             self.dm.LeftClick()
             self.dm.MoveTo(595, 151)
             self.dm.LeftClick()
@@ -306,18 +256,18 @@ class DnfModel():
                 gl.set_value("jbleft", retleft)
                 status = "成功"
                 num = (int(jbleft) - int(retleft)) / int(ret)
-            print(msg + "=>" + "数量：" + str(num) + "|" + status)
+            mylog(self.dm,msg + "=>" + "数量：" + str(num) + "|" + status)
 
             if (retleft != -1 and int(retleft) < 5000000):
-                print("金币不足")
+                mylog(self.dm,"金币不足")
                 gl.set_value("doBuyClickThreadError", 1)  # 金币不足触发上架判断
 
         if (ret == -1):
-            print("识别单价失败")
+            mylog(self.dm,"识别单价失败")
             gl.set_value("doBuyClickThreadError", 1)
         t2 = int(time.strftime("%M", time.localtime()))
         if (t2 % 10 == 0):
-            print("例行检查")
+            mylog(self.dm,"例行检查")
             gl.set_value("doBuyClickThreadError", 1)
 
     def getMail(self, data=None):
@@ -334,7 +284,7 @@ class DnfModel():
     def upSell(self, item):
         item = self.currentItem
         if (item == None):
-            myexit("currentItem为None")
+            myexit(self.dm,"currentItem为None")
         self.clear()
         if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
             self.dm.KeyPress(76)
@@ -386,3 +336,4 @@ class DnfModel():
         LeftClick(self.dm)
         clickPic(self.dm, "dnfimg/关闭.bmp", 10, 0, 578, 103, 638, 144)
         clickPic(self.dm, "dnfimg/关闭拍卖行.bmp", 10, 0, 722, 27, 807, 60)
+
