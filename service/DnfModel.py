@@ -147,14 +147,13 @@ class DnfModel():
         findPic(self.dm, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
         time.sleep(45)
         # 准备扫拍
-        gl._init()
         gl.set_value("spmPreThreadTarget", 1)
 
-    def spmhPre(self, item):
+    def spmhPre(self):
 
         # 判断当前角色
-        self.clear()
-        self.getMail(item)
+        self.getMail()
+        time.sleep(0.5)
         self.dm.KeyPress(77)
         time.sleep(1)
         for index in range(len(self.IDs)):
@@ -184,7 +183,7 @@ class DnfModel():
             mylog(self.dm,"金币充足，继续扫拍")
             # 继续扫拍
         else:
-            self.upSell(item)
+            self.upSell()
             # 更换角色
             mylog(self.dm,"金币不足")
             gl.set_value("JbIsNotEnoughError", 1)
@@ -214,15 +213,14 @@ class DnfModel():
         MoveTo(self.dm, 595, 141)  # 移动到价格tip
 
         # 扫拍执行
-        gl._init()
         gl.set_value("spmSearchThreadTarget", 1)
         gl.set_value("doBuyClickThreadTarget", 1)
 
     # 不断输入enter键，持续刷新拍卖行数据
-    def spmSearch(self, item):
+    def spmSearch(self,):
         self.dm.KeyPress(13)
 
-    def doBuyClick(self, item):
+    def doBuyClick(self):
         item = self.currentItem
         if (item == None):
             myexit(self.dm,"currentItem为None")
@@ -251,6 +249,8 @@ class DnfModel():
             self.dm.LeftCLick()
             self.dm.MoveTo(595, 141)  # 移回到价格tip
 
+            gl.set_cache("lastTryDoBuyClickTime",int(time.time()))#终极大招的判断依据
+
             retleft = ocrJb(self.dm)  # 检查金币数量，金币不足上架，换角色
             jbleft = gl.get_value("jbleft")
             if (jbleft == retleft):
@@ -270,15 +270,7 @@ class DnfModel():
             mylog(self.dm,"识别单价失败")
             gl.set_value("doBuyClickThreadError", 1)
 
-        tm = int(time.strftime("%M", time.localtime()))
-        ts = int(time.strftime("%S", time.localtime()))
-
-        #每20分钟检查一次
-        if (tm % 20 == 0 and ts < 5):
-            mylog(self.dm,"例行检查")
-            gl.set_value("doBuyClickThreadError", 1)
-
-    def getMail(self, data=None):
+    def getMail(self):
         self.clear()
         for i in range(10):
             if (findPic(self.dm, "dnfimg/邮件.bmp", 10, 0, 575, 447, 777, 547)[0] == 0):  # 如果有邮件
@@ -289,7 +281,7 @@ class DnfModel():
             else:
                 break
 
-    def upSell(self, item):
+    def upSell(self):
         item = self.currentItem
         if (item == None):
             myexit(self.dm,"currentItem为None")

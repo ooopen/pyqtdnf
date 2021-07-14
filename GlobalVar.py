@@ -1,26 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
-# 线程
-def _init():
-    global _global_thread
-    _global_thread = {
-    }
-
-
-def set_thread(name, value):
-    global _global_thread
-    _global_thread[name] = value
-
-
-def get_thread(name, defValue=0):
-    try:
-        return _global_thread[name]
-    except KeyError:
-        return defValue
-
-
-# 杂项
 def _init():
     global _global_dict
     _global_dict = {

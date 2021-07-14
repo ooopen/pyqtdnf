@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QSystemTrayIcon, QMenu, QActi
 from system_hotkey import SystemHotkey
 
 from service.DnfModel import DnfModel
+from tools.DmTools import mylog
 from ui.main1 import Ui_Form
 
 import GlobalVar as gl
@@ -31,6 +32,7 @@ class MainWindow(QWidget):
     exchangeRoleThread = null
     exchangeIdThread = null
     beforeExchangeIdThread = null
+    threadControlThread = null
 
     currentThread = null
 
@@ -54,141 +56,114 @@ class MainWindow(QWidget):
         self.hk_stop.register(('control', 'f10'), callback=lambda x: self.stop("admin"))
         self.hk_stop.register(('control', 'f9'), callback=lambda x: self.start("admin"))
 
-        self.currentItem = None  # 此变量已经废弃
-
         gl._init()
         gl._init_cache()
 
     def testCurrent(self):
-        self.currentThread = self.runThread(self.currentThread, lambda: self.currentThreadTarget(self.currentItem),
-                                            "currentThread")
-        gl.set_value("currentThreadTarget", 1)  # 开启当前调试线程
+        # self.currentThread = self.runThread(self.currentThread, lambda: self.currentThreadTarget(self.currentItem),
+        mylog(self.model.dm, self.loginThreadTarget.__name__)
 
     def start(self, admin=None):
-        print("start")
+        mylog(self.model.dm, "start")
+
+        self.demonThread = self.runThread(self.demonThread, self.demonThreadTarget)
+        self.threadControlThread = self.runThread(self.threadControlThread, self.threadControlThreadTarget)
+
         if (admin == "restart"):
             gl.set_value("loginThreadTarget", 1)  # 重启
         if (admin == "admin"):
             gl.set_value("spmPreThreadTarget", 1)  # 默认从扫拍开启
 
-        self.demonThread = self.runThread(self.demonThread, self.demonThreadTarget, "demonThread")
-
-        self.loginThread = self.runThread(self.loginThread, self.loginThreadTarget, "loginThread")
-
-        self.spmPreThread = self.runThread(self.spmPreThread, lambda: self.spmPreThreadTarget(self.currentItem),
-                                           "spmPreThread")
-
-        self.spmSearchThread = self.runThread(self.spmSearchThread,
-                                              lambda: self.spmSearchThreadTarget(self.currentItem), "spmSearchThread")
-
-        self.doBuyClickThread = self.runThread(self.doBuyClickThread,
-                                               lambda: self.doBuyClickThreadTarget(self.currentItem),
-                                               "doBuyClickThread")
-        self.getMailThread = self.runThread(self.getMailThread, self.getMailThreadTarget, "getMailThread")
-
-        self.exchangeIdThread = self.runThread(self.exchangeIdThread,
-                                               lambda: self.exchangeIdThreadTarget(self.currentItem),
-                                               "exchangeIdThread")
-
     def loginThreadTarget(self):
-        self.threadTarget(self.model.loginOrExchangeId, True, "login")
+        self.model.loginOrExchangeId("login")
 
-    def spmPreThreadTarget(self, item):
-        self.threadTarget(self.model.spmhPre, True, item)
+    def exchangeIdThreadTarget(self):
+        self.model.loginOrExchangeId("exchangeId")
 
-    def spmSearchThreadTarget(self, item):
-        self.threadTarget(self.model.spmSearch, False, item)
+    def spmPreThreadTarget(self):
+        self.model.spmhPre()
 
-    def doBuyClickThreadTarget(self, item):
-        self.threadTarget(self.model.doBuyClick, False, item)
+    def spmSearchThreadTarget(self):
+        while (1):
+            self.model.spmSearch()
 
-    def getMailThreadTarget(self):
-        self.threadTarget(self.model.getMail, True)
+    def doBuyClickThreadTarget(self):
+        while (1):
+            self.model.doBuyClick()
 
-    def exchangeIdThreadTarget(self, item):
-        self.threadTarget(self.model.loginOrExchangeId, True, "exchangeId")
+    def currentThreadTarget(self):
+        self.model.current()
 
-    def currentThreadTarget(self, item):
-        self.threadTarget(self.model.current, True, item)
+    def threadControlThreadTarget(self):
 
-    def demonThreadControl(self):
-        print(1)
+        while (1):
+            if (gl.get_value("loginThreadTarget") == 1):
+                self.loginThread = self.runThread(self.loginThread, self.loginThreadTarget)
+                gl.set_value("loginThreadTarget", 0)
 
+            if (gl.get_value("exchangeIdThreadTarget") == 1):
+                self.exchangeIdThread = self.runThread(self.exchangeIdThread, self.exchangeIdThreadTarget)
+                gl.set_value("exchangeIdThreadTarget", 0)
+
+            if (gl.get_value("spmPreThreadTarget") == 1):
+                self.spmPreThread = self.runThread(self.spmPreThread, self.spmPreThreadTarget)
+                gl.set_value("spmPreThreadTarget", 0)
+
+            if (gl.get_value("spmSearchThreadTarget") == 1):
+                self.spmSearchThread = self.runThread(self.spmSearchThread, self.spmSearchThreadTarget)
+                gl.set_value("spmSearchThreadTarget", 0)
+
+            if (gl.get_value("doBuyClickThreadTarget") == 1):
+                self.doBuyClickThread = self.runThread(self.doBuyClickThread, self.doBuyClickThreadTarget)
+                gl.set_value("doBuyClickThreadTarget", 0)
 
     def demonThreadTarget(self):
-        print("demonThreadTarget")
+        mylog(self.model.dm, "demonThreadTarget")
         while (1):
             if (gl.get_value("doBuyClickThreadError") == 1):  # 扫拍异常修复
-                print("doBuyClickThreadError")
+                mylog(self.model.dm, "doBuyClickThreadError")
                 self.stop()
-                gl._init()
-
                 gl.set_value("spmPreThreadTarget", 1)
 
-                self.start()
-
             if (gl.get_value("JbIsNotEnoughError") == 1):  # 换角色
-                print("JbIsNotEnoughError")
+                mylog(self.model.dm, "JbIsNotEnoughError")
                 self.stop()
-                gl._init()
-
                 gl.set_value("exchangeIdThreadTarget", 1)
 
-                self.start()
-
             if (gl.get_value("networkError") == 1):  # 网络错误，直接重启
-                print("networkError")
+                mylog(self.model.dm, "networkError")
                 self.stop()
-                gl._init()
-
                 gl.set_value("loginThreadTarget", 1)
-
-                self.start()
 
             # 终极大招，以试图抢购为依据，判断物价过高，或者金币不足，或者脚本异常,发邮件告警。
-
             stime = gl.get_cache("lastTryDoBuyClickTime")
             etime = int(time.time())
-            if (etime - stime > 60 * 20):
-                print("抢购异常")
-
+            if (stime != 0 and etime - stime > 60 * 30):
+                mylog(self.model.dm, "抢购异常")
                 self.stop()
-                gl._init()
-
                 gl.set_value("loginThreadTarget", 1)
-
-                self.start()
-
-            if (gl.get_value("networkError") == 1):  # 网络错误，直接重启
-                print("networkError")
-                self.stop()
-                gl._init()
-
-                gl.set_value("loginThreadTarget", 1)
-
-                self.start()
 
     def stop(self, items=null):  # 停止子线程
-        print("stop")
+        mylog(self.model.dm, "stop")
+        gl._init()
         if (items == null):
             items = [self.loginThread, self.spmPreThread, self.spmSearchThread, self.doBuyClickThread,
-                     self.getMailThread, self.currentThread, self.exchangeIdThread, self.beforeExchangeIdThread]
+                     self.currentThread, self.exchangeIdThread]
         if (items == "admin"):
             items = [self.loginThread, self.spmPreThread, self.spmSearchThread, self.doBuyClickThread,
-                     self.getMailThread, self.currentThread, self.exchangeIdThread, self.beforeExchangeIdThread,
+                     self.currentThread, self.exchangeIdThread, self.threadControlThread,
                      self.demonThread]
 
         for i in items:
             print(i)
             if (i != null and i.is_alive()):
                 self._async_raise(i.ident, SystemExit)
-        time.sleep(1)
 
-    def runThread(self, thread, target, threadName):
+    def runThread(self, thread, target):
 
         if (thread != null and thread.is_alive()):
             return thread  # 不重复开启线程
-        thread = Thread(target=target, name=threadName,
+        thread = Thread(target=target, name=target.__name__,
                         args=()  # 元组
                         )
         thread.start()
