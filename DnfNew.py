@@ -75,19 +75,29 @@ class MainWindow(QWidget):
             gl.set_value("spmPreThreadTarget", 1)  # 默认从扫拍开启
 
     def loginThreadTarget(self):
+        self.model.dm.SetKeypadDelay("normal", 10)
+        self.model.dm.SetMouseDelay("normal", 10)
         self.model.loginOrExchangeId("login")
 
     def exchangeIdThreadTarget(self):
+        self.model.dm.SetKeypadDelay("normal", 10)
+        self.model.dm.SetMouseDelay("normal", 10)
         self.model.loginOrExchangeId("exchangeId")
 
     def spmPreThreadTarget(self):
+        self.model.dm.SetKeypadDelay("normal", 10)
+        self.model.dm.SetMouseDelay("normal", 10)
         self.model.spmhPre()
 
     def spmSearchThreadTarget(self):
+        self.model.dm.SetKeypadDelay("normal", 1)
+        self.model.dm.SetMouseDelay("normal", 1)
         while (1):
             self.model.spmSearch()
 
     def doBuyClickThreadTarget(self):
+        self.model.dm.SetKeypadDelay("normal", 1)
+        self.model.dm.SetMouseDelay("normal", 1)
         while (1):
             self.model.doBuyClick()
 
@@ -140,6 +150,7 @@ class MainWindow(QWidget):
             etime = int(time.time())
             if (stime != 0 and etime - stime > 60 * 30):
                 mylog(self.model.dm, "抢购异常")
+                self.model.warnning()
                 self.stop()
                 gl.set_value("loginThreadTarget", 1)
 

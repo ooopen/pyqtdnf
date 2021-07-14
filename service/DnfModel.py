@@ -37,16 +37,14 @@ class DnfModel():
             time.sleep(1)
 
     def current(self, item):
-        self.dm.WriteFile("log.txt","哈哈哈\r\n")
-
-
+        self.dm.WriteFile("log.txt", "哈哈哈\r\n")
 
     ###type=[login，exchangeId]
     def loginOrExchangeId(self, type="login"):
 
         hwnd = FindWindow(self.dm, "WeGame", 1)
-        if(hwnd == 0):
-            type = "login"#防止wg已经退出的情况
+        if (hwnd == 0):
+            type = "login"  # 防止wg已经退出的情况
 
         if (type == "login"):
             # 重启dnf和wegame
@@ -78,7 +76,7 @@ class DnfModel():
             LeftClick(self.dm)
             time.sleep(1)
 
-        #重启wg后如果wg是已登录状态，则直接启动
+        # 重启wg后如果wg是已登录状态，则直接启动
         if (type == "login"):
             ret = findPic(self.dm, "dnfimg/wg已登录.bmp", 50, 0, 0, 0, 200, 200)
             if (ret[0] == 0):
@@ -116,14 +114,14 @@ class DnfModel():
                 time.sleep(1)
                 ret = findPic(self.dm, "dnfimg/滑条err.bmp", 50, 0, 0, 0, 941, 679)
                 if (ret[0] != 0):
-                                break
+                    break
                 time.sleep(1)
                 MoveTo(self.dm, 555, 162)  # 刷新验证码
                 time.sleep(0.1)
                 LeftClick(self.dm)
                 time.sleep(1)
                 if (i == 7):
-                    myexit(self.dm,"verification code is not auth")
+                    myexit(self.dm, "verification code is not auth")
 
         time.sleep(3)
         self.startGame()
@@ -141,8 +139,8 @@ class DnfModel():
         time.sleep(1)
         clickPic(self.dm, "dnfimg/游戏开始.bmp", 2000)
         time.sleep(1)
-        MoveTo(self.dm,410,570)
-        LeftClick(self.dm) #防止没点到开始
+        MoveTo(self.dm, 410, 570)
+        LeftClick(self.dm)  # 防止没点到开始
         time.sleep(10)
         findPic(self.dm, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
         time.sleep(45)
@@ -159,14 +157,14 @@ class DnfModel():
         for index in range(len(self.IDs)):
             if (findPic(self.dm, self.IDs[index]['idImg'], 10, 0, 156, 204, 344, 303)[0] == 0):
                 self.currentItem = self.IDs[index]
-                mylog(self.dm,self.currentItem)
-                mylog(self.dm,"current id is " + self.IDs[index]['idImg'])
+                mylog(self.dm, self.currentItem)
+                mylog(self.dm, "current id is " + self.IDs[index]['idImg'])
                 break
             if (index + 1 == len(self.IDs)):
-                myexit(self.dm,"id is not found")
+                myexit(self.dm, "id is not found")
                 return
         if (self.currentItem == None):
-            myexit(self.dm,"currentItem为None")
+            myexit(self.dm, "currentItem为None")
 
         self.dm.KeyPress(77)  # 关闭角色信息
         time.sleep(0.5)
@@ -174,18 +172,17 @@ class DnfModel():
         self.dm.KeyPress(76)
         time.sleep(1)
 
-        #判断金币是否充足，否则换角色
+        # 判断金币是否充足，否则换角色
         ret = ocrJb(self.dm)  # 检查金币数量，金币不足上架
-        gl.set_value("jbleft", ret)#为第一次购买成功计算依据
-
+        gl.set_value("jbleft", ret)  # 为第一次购买成功计算依据
 
         if (ret != -1 and int(ret) > 5000000):
-            mylog(self.dm,"金币充足，继续扫拍")
+            mylog(self.dm, "金币充足，继续扫拍")
             # 继续扫拍
         else:
             self.upSell()
             # 更换角色
-            mylog(self.dm,"金币不足")
+            mylog(self.dm, "金币不足")
             gl.set_value("JbIsNotEnoughError", 1)
             return
 
@@ -217,13 +214,13 @@ class DnfModel():
         gl.set_value("doBuyClickThreadTarget", 1)
 
     # 不断输入enter键，持续刷新拍卖行数据
-    def spmSearch(self,):
+    def spmSearch(self, ):
         self.dm.KeyPress(13)
 
     def doBuyClick(self):
         item = self.currentItem
         if (item == None):
-            myexit(self.dm,"currentItem为None")
+            myexit(self.dm, "currentItem为None")
         t1 = time.time()
         ret = ocrDj(self.dm)
 
@@ -249,7 +246,7 @@ class DnfModel():
             self.dm.LeftCLick()
             self.dm.MoveTo(595, 141)  # 移回到价格tip
 
-            gl.set_cache("lastTryDoBuyClickTime",int(time.time()))#终极大招的判断依据
+            gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 终极大招的判断依据
 
             retleft = ocrJb(self.dm)  # 检查金币数量，金币不足上架，换角色
             jbleft = gl.get_value("jbleft")
@@ -260,14 +257,14 @@ class DnfModel():
                 gl.set_value("jbleft", retleft)
                 status = "成功"
                 num = (int(jbleft) - int(retleft)) / int(ret)
-            mylog(self.dm,msg + "=>" + "数量：" + str(num) + "|" + status)
+            mylog(self.dm, msg + "=>" + "数量：" + str(num) + "|" + status)
 
             if (retleft != -1 and int(retleft) < 5000000):
-                mylog(self.dm,"金币不足")
+                mylog(self.dm, "金币不足")
                 gl.set_value("doBuyClickThreadError", 1)  # 金币不足触发上架判断
 
         if (ret == -1):
-            mylog(self.dm,"识别单价失败")
+            mylog(self.dm, "识别单价失败")
             gl.set_value("doBuyClickThreadError", 1)
 
     def getMail(self):
@@ -284,7 +281,7 @@ class DnfModel():
     def upSell(self):
         item = self.currentItem
         if (item == None):
-            myexit(self.dm,"currentItem为None")
+            myexit(self.dm, "currentItem为None")
         self.clear()
         if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
             self.dm.KeyPress(76)
@@ -329,16 +326,16 @@ class DnfModel():
 
     def warnning(self):
 
-        #截图
+        # 截图
+        self.dm.CaptureJpg(0, 0, 2000, 2000, "screen.jpg", 50)
         mail1.send(subject='Test',
                    text='This is a test!',
                    recipients='375161864@qq.com',
                    sender='1107769317@qq.com',
                    username='1107769317@qq.com',
                    password='mvbvvjyckktojegd',
-                   attachments={'file.bmp': './screenshot/back.bmp'},
+                   attachments={'screen.jpg': './screenshot/screen.jpg'},
                    smtp_host='smtp.qq.com')
-
 
     def clear(self):
         self.initWindow()
@@ -349,4 +346,3 @@ class DnfModel():
         LeftClick(self.dm)
         clickPic(self.dm, "dnfimg/关闭.bmp", 10, 0, 578, 103, 638, 144)
         clickPic(self.dm, "dnfimg/关闭拍卖行.bmp", 10, 0, 722, 27, 807, 60)
-
