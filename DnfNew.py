@@ -57,6 +57,7 @@ class MainWindow(QWidget):
         self.currentItem = None  # 此变量已经废弃
 
         gl._init()
+        gl._init_cache()
 
     def testCurrent(self):
         self.currentThread = self.runThread(self.currentThread, lambda: self.currentThreadTarget(self.currentItem),
@@ -90,26 +91,29 @@ class MainWindow(QWidget):
                                                "exchangeIdThread")
 
     def loginThreadTarget(self):
-        self.threadTarget(self.model.loginOrExchangeId, "loginThreadTarget", True, [], "login")
+        self.threadTarget(self.model.loginOrExchangeId, True, "login")
 
     def spmPreThreadTarget(self, item):
-        self.threadTarget(self.model.spmhPre, "spmPreThreadTarget", True, [], item)
+        self.threadTarget(self.model.spmhPre, True, item)
 
     def spmSearchThreadTarget(self, item):
-        self.threadTarget(self.model.spmSearch, "spmSearchThreadTarget", False, [], item)
+        self.threadTarget(self.model.spmSearch, False, item)
 
     def doBuyClickThreadTarget(self, item):
-        self.threadTarget(self.model.doBuyClick, "doBuyClickThreadTarget", False, [], item)
+        self.threadTarget(self.model.doBuyClick, False, item)
 
     def getMailThreadTarget(self):
-        self.threadTarget(self.model.getMail, "getMailThreadTarget", True, [])
-
+        self.threadTarget(self.model.getMail, True)
 
     def exchangeIdThreadTarget(self, item):
-        self.threadTarget(self.model.loginOrExchangeId, "exchangeIdThreadTarget", True, [], "exchangeId")
+        self.threadTarget(self.model.loginOrExchangeId, True, "exchangeId")
 
     def currentThreadTarget(self, item):
-        self.threadTarget(self.model.current, "currentThreadTarget", True, [], item)
+        self.threadTarget(self.model.current, True, item)
+
+    def demonThreadControl(self):
+        print(1)
+
 
     def demonThreadTarget(self):
         print("demonThreadTarget")
@@ -132,7 +136,30 @@ class MainWindow(QWidget):
 
                 self.start()
 
-            if (gl.get_value("networkError") == 1):  # 网络错误，直接换角色
+            if (gl.get_value("networkError") == 1):  # 网络错误，直接重启
+                print("networkError")
+                self.stop()
+                gl._init()
+
+                gl.set_value("loginThreadTarget", 1)
+
+                self.start()
+
+            # 终极大招，以试图抢购为依据，判断物价过高，或者金币不足，或者脚本异常,发邮件告警。
+
+            stime = gl.get_cache("lastTryDoBuyClickTime")
+            etime = int(time.time())
+            if (etime - stime > 60 * 20):
+                print("抢购异常")
+
+                self.stop()
+                gl._init()
+
+                gl.set_value("loginThreadTarget", 1)
+
+                self.start()
+
+            if (gl.get_value("networkError") == 1):  # 网络错误，直接重启
                 print("networkError")
                 self.stop()
                 gl._init()
@@ -167,19 +194,12 @@ class MainWindow(QWidget):
         thread.start()
         return thread
 
-    def threadTarget(self, func, sign, once=True, startSigns=[], data=null):
-        # print(func.__name__)
-
-        while (1):
-            if (gl.get_value(sign) == 0):
-                time.sleep(1)
-            else:
-                if (once):  # 只执行一次，关闭标识
-                    gl.set_value(sign, 0)
-                # print(func.__name__)
+    def threadTarget(self, func, once=True, data=null):
+        if (once):
+            func(data)
+        else:
+            while (1):
                 func(data)  # 执行具体业务
-                for item in startSigns:  # 执行完毕，开启下一步线程
-                    gl.set_value(item, 1)
 
     def _async_raise(self, tid, exctype):
         """Raises an exception in the threads with id tid"""

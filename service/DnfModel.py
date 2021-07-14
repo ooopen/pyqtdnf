@@ -2,6 +2,7 @@ import ctypes
 import os
 import time
 
+import mail1
 import win32process
 from win32com.client import Dispatch
 
@@ -176,6 +177,9 @@ class DnfModel():
 
         #判断金币是否充足，否则换角色
         ret = ocrJb(self.dm)  # 检查金币数量，金币不足上架
+        gl.set_value("jbleft", ret)#为第一次购买成功计算依据
+
+
         if (ret != -1 and int(ret) > 5000000):
             mylog(self.dm,"金币充足，继续扫拍")
             # 继续扫拍
@@ -265,8 +269,12 @@ class DnfModel():
         if (ret == -1):
             mylog(self.dm,"识别单价失败")
             gl.set_value("doBuyClickThreadError", 1)
-        t2 = int(time.strftime("%M", time.localtime()))
-        if (t2 % 10 == 0):
+
+        tm = int(time.strftime("%M", time.localtime()))
+        ts = int(time.strftime("%S", time.localtime()))
+
+        #每20分钟检查一次
+        if (tm % 20 == 0 and ts < 5):
             mylog(self.dm,"例行检查")
             gl.set_value("doBuyClickThreadError", 1)
 
@@ -326,6 +334,19 @@ class DnfModel():
 
         time.sleep(0.1)
         self.dm.KeyPress(27)  # 重置一下
+
+    def warnning(self):
+
+        #截图
+        mail1.send(subject='Test',
+                   text='This is a test!',
+                   recipients='375161864@qq.com',
+                   sender='1107769317@qq.com',
+                   username='1107769317@qq.com',
+                   password='mvbvvjyckktojegd',
+                   attachments={'file.bmp': './screenshot/back.bmp'},
+                   smtp_host='smtp.qq.com')
+
 
     def clear(self):
         self.initWindow()
