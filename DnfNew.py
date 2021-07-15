@@ -75,29 +75,19 @@ class MainWindow(QWidget):
             gl.set_value("spmPreThreadTarget", 1)  # 默认从扫拍开启
 
     def loginThreadTarget(self):
-        self.model.dm.SetKeypadDelay("normal", 10)
-        self.model.dm.SetMouseDelay("normal", 10)
         self.model.loginOrExchangeId("login")
 
     def exchangeIdThreadTarget(self):
-        self.model.dm.SetKeypadDelay("normal", 10)
-        self.model.dm.SetMouseDelay("normal", 10)
         self.model.loginOrExchangeId("exchangeId")
 
     def spmPreThreadTarget(self):
-        self.model.dm.SetKeypadDelay("normal", 10)
-        self.model.dm.SetMouseDelay("normal", 10)
         self.model.spmhPre()
 
     def spmSearchThreadTarget(self):
-        self.model.dm.SetKeypadDelay("normal", 1)
-        self.model.dm.SetMouseDelay("normal", 1)
         while (1):
             self.model.spmSearch()
 
     def doBuyClickThreadTarget(self):
-        self.model.dm.SetKeypadDelay("normal", 1)
-        self.model.dm.SetMouseDelay("normal", 1)
         while (1):
             self.model.doBuyClick()
 
@@ -106,26 +96,12 @@ class MainWindow(QWidget):
 
     def threadControlThreadTarget(self):
 
+        arr = ["loginThread", "exchangeIdThread", "spmPreThread", "spmSearchThread", "doBuyClickThread"]
+
         while (1):
-            if (gl.get_value("loginThreadTarget") == 1):
-                self.loginThread = self.runThread(self.loginThread, self.loginThreadTarget)
-                gl.set_value("loginThreadTarget", 0)
-
-            if (gl.get_value("exchangeIdThreadTarget") == 1):
-                self.exchangeIdThread = self.runThread(self.exchangeIdThread, self.exchangeIdThreadTarget)
-                gl.set_value("exchangeIdThreadTarget", 0)
-
-            if (gl.get_value("spmPreThreadTarget") == 1):
-                self.spmPreThread = self.runThread(self.spmPreThread, self.spmPreThreadTarget)
-                gl.set_value("spmPreThreadTarget", 0)
-
-            if (gl.get_value("spmSearchThreadTarget") == 1):
-                self.spmSearchThread = self.runThread(self.spmSearchThread, self.spmSearchThreadTarget)
-                gl.set_value("spmSearchThreadTarget", 0)
-
-            if (gl.get_value("doBuyClickThreadTarget") == 1):
-                self.doBuyClickThread = self.runThread(self.doBuyClickThread, self.doBuyClickThreadTarget)
-                gl.set_value("doBuyClickThreadTarget", 0)
+            for item in arr:
+                if (gl.get_value("item") + "Target" == 1):
+                    exec("self." + item + "=self.runThread(self." + item + ", self." + item + "Target)")
 
     def demonThreadTarget(self):
         mylog(self.model.dm, "demonThreadTarget")

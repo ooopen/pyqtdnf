@@ -326,15 +326,16 @@ class DnfModel():
 
     def warnning(self):
 
+        file = "runtime" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
         # 截图
-        self.dm.CaptureJpg(0, 0, 2000, 2000, "screen.jpg", 50)
+        self.dm.CaptureJpg(0, 0, 2000, 2000, "./screenshot/screen.jpg", 50)
         mail1.send(subject='Test',
                    text='This is a test!',
                    recipients='375161864@qq.com',
                    sender='1107769317@qq.com',
                    username='1107769317@qq.com',
                    password='mvbvvjyckktojegd',
-                   attachments={'screen.jpg': './screenshot/screen.jpg'},
+                   attachments={'screen.jpg': './screenshot/screen.jpg', 'log.txt': './log/' + file},
                    smtp_host='smtp.qq.com')
 
     def clear(self):
