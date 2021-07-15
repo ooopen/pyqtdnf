@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QSystemTrayIcon, QMenu, QActi
 from system_hotkey import SystemHotkey
 
 from service.DnfModel import DnfModel
-from tools.DmTools import mylog
+from tools.DmTools import mylog, varname
 from ui.main1 import Ui_Form
 
 import GlobalVar as gl
@@ -36,7 +36,7 @@ class MainWindow(QWidget):
 
     currentThread = null
 
-    getMailTimes = 60 * 10  # 收邮件和上架的间隔（秒）
+    checkTime = 60 * 30  # 自检时间间隔
 
     # 界面配置信息，先写死
 
@@ -70,9 +70,9 @@ class MainWindow(QWidget):
         self.threadControlThread = self.runThread(self.threadControlThread, self.threadControlThreadTarget)
 
         if (admin == "restart"):
-            gl.set_value("loginThreadTarget", 1)  # 重启
+            gl.set_value("loginThread", 1)  # 重启
         if (admin == "admin"):
-            gl.set_value("spmPreThreadTarget", 1)  # 默认从扫拍开启
+            gl.set_value("spmPreThread", 1)  # 默认从扫拍开启
 
     def loginThreadTarget(self):
         self.model.loginOrExchangeId("login")
@@ -100,35 +100,36 @@ class MainWindow(QWidget):
 
         while (1):
             for item in arr:
-                if (gl.get_value("item") + "Target" == 1):
+                if (gl.get_value(item) == 1):
                     exec("self." + item + "=self.runThread(self." + item + ", self." + item + "Target)")
+                    gl.set_value(item, 0)
 
     def demonThreadTarget(self):
-        mylog(self.model.dm, "demonThreadTarget")
         while (1):
             if (gl.get_value("doBuyClickThreadError") == 1):  # 扫拍异常修复
                 mylog(self.model.dm, "doBuyClickThreadError")
                 self.stop()
-                gl.set_value("spmPreThreadTarget", 1)
+                gl.set_value("spmPreThread", 1)
 
             if (gl.get_value("JbIsNotEnoughError") == 1):  # 换角色
                 mylog(self.model.dm, "JbIsNotEnoughError")
                 self.stop()
-                gl.set_value("exchangeIdThreadTarget", 1)
+                gl.set_value("exchangeIdThread", 1)
 
             if (gl.get_value("networkError") == 1):  # 网络错误，直接重启
                 mylog(self.model.dm, "networkError")
                 self.stop()
-                gl.set_value("loginThreadTarget", 1)
+                gl.set_value("loginThread", 1)
 
             # 终极大招，以试图抢购为依据，判断物价过高，或者金币不足，或者脚本异常,发邮件告警。
             stime = gl.get_cache("lastTryDoBuyClickTime")
             etime = int(time.time())
-            if (stime != 0 and etime - stime > 60 * 30):
+            if (stime != 0 and etime - stime > self.checkTime and etime - stime < self.checkTime + 2):
                 mylog(self.model.dm, "抢购异常")
                 self.model.warnning()
                 self.stop()
-                gl.set_value("loginThreadTarget", 1)
+                gl.set_value("loginThread", 1)
+                time.sleep(3)
 
     def stop(self, items=null):  # 停止子线程
         mylog(self.model.dm, "stop")
@@ -150,6 +151,7 @@ class MainWindow(QWidget):
 
         if (thread != null and thread.is_alive()):
             return thread  # 不重复开启线程
+        print(target.__name__)
         thread = Thread(target=target, name=target.__name__,
                         args=()  # 元组
                         )

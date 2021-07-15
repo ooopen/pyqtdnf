@@ -32,8 +32,8 @@ class DnfModel():
 
         hwnd = FindWindow(self.dm, title, num, isKill)
         if (hwnd != 0):
-            self.dm.MoveWindow(hwnd, 0, 0)
             self.dm.SetWindowState(hwnd, 1)
+            self.dm.MoveWindow(hwnd, 0, 0)
             time.sleep(1)
 
     def current(self, item):
@@ -63,9 +63,11 @@ class DnfModel():
             # 关闭游戏
             self.initWindow("WeGame", 10, 1)
             time.sleep(1)
-            clickPic(self.dm, "dnfimg/关闭应用1.bmp", 100, 1, 1198, 747, 1286, 839)
-            clickPic(self.dm, "dnfimg/关闭应用2.bmp", 100, 1, 1001, 693, 1139, 752)
-            clickPic(self.dm, "dnfimg/关闭应用3.bmp", 100, 1, 673, 485, 1187, 788)
+            clickPic(self.dm, "dnfimg/wg首页.bmp", 100, 0, 0, 0, 1300, 1200)
+            clickPic(self.dm, "dnfimg/wg地下城.bmp", 50, 0, 0, 0, 1300, 1200)
+            clickPic(self.dm, "dnfimg/关闭应用1.bmp", 50, 1, 1198, 747, 1286, 839)
+            clickPic(self.dm, "dnfimg/关闭应用2.bmp", 50, 1, 1001, 693, 1139, 752)
+            clickPic(self.dm, "dnfimg/关闭应用3.bmp", 50, 1, 673, 485, 1187, 788)
 
             # 点击切换账号
             self.initWindow("WeGame", 10, 1)
@@ -141,11 +143,13 @@ class DnfModel():
         time.sleep(1)
         MoveTo(self.dm, 410, 570)
         LeftClick(self.dm)  # 防止没点到开始
+        LeftClick(self.dm)  # 防止没点到开始
         time.sleep(10)
         findPic(self.dm, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
         time.sleep(45)
         # 准备扫拍
-        gl.set_value("spmPreThreadTarget", 1)
+        gl.set_value("spmPreThread", 1)
+
 
     def spmhPre(self):
 
@@ -153,6 +157,9 @@ class DnfModel():
         self.getMail()
         time.sleep(0.5)
         self.dm.KeyPress(77)
+        if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181,2,315,125)[0] == -1):
+            self.dm.KeyPress(77)
+
         time.sleep(1)
         for index in range(len(self.IDs)):
             if (findPic(self.dm, self.IDs[index]['idImg'], 10, 0, 156, 204, 344, 303)[0] == 0):
@@ -161,7 +168,8 @@ class DnfModel():
                 mylog(self.dm, "current id is " + self.IDs[index]['idImg'])
                 break
             if (index + 1 == len(self.IDs)):
-                myexit(self.dm, "id is not found")
+                mylog(self.dm, "id is not found")
+                gl.set_value("spmPreThread", 1)
                 return
         if (self.currentItem == None):
             myexit(self.dm, "currentItem为None")
@@ -210,8 +218,8 @@ class DnfModel():
         MoveTo(self.dm, 595, 141)  # 移动到价格tip
 
         # 扫拍执行
-        gl.set_value("spmSearchThreadTarget", 1)
-        gl.set_value("doBuyClickThreadTarget", 1)
+        gl.set_value("spmSearchThread", 1)
+        gl.set_value("doBuyClickThread", 1)
 
     # 不断输入enter键，持续刷新拍卖行数据
     def spmSearch(self, ):
@@ -270,8 +278,8 @@ class DnfModel():
     def getMail(self):
         self.clear()
         for i in range(10):
-            if (findPic(self.dm, "dnfimg/邮件.bmp", 10, 0, 575, 447, 777, 547)[0] == 0):  # 如果有邮件
-                clickPic(self.dm, "dnfimg/邮件.bmp", 5, 0, 575, 447, 777, 547)
+            if (findPic(self.dm, "dnfimg/邮件.bmp", 10, 0, 685,463,801,541)[0] == 0):  # 如果有邮件
+                clickPic(self.dm, "dnfimg/邮件.bmp", 5, 0, 685,463,801,541)
                 clickPic(self.dm, "dnfimg/选择接收.bmp", 5, 0, 232, 433, 348, 494)
                 time.sleep(0.5)
                 self.dm.KeyPress(27)  # 重置一下

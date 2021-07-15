@@ -1,5 +1,7 @@
 import ctypes
+import inspect
 import os
+import re
 import time
 import traceback
 
@@ -179,6 +181,12 @@ def SendString(dm, str):
     hwnd = dm.GetForegroundFocus()
     dm.SendString(hwnd, str)
     time.sleep(0.1)
+
+def varname(p):
+    for line in inspect.getframeinfo(inspect.currentframe().f_back)[3]:
+        m = re.search(r'\bvarname\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)', line)
+    if m:
+        return m.group(1)
 
 
 def mylog(dm, msg):
