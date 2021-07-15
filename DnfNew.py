@@ -146,6 +146,7 @@ class MainWindow(QWidget):
             print(i)
             if (i != null and i.is_alive()):
                 self._async_raise(i.ident, SystemExit)
+        time.sleep(2) #防止没有杀干净，新进程起不来
 
     def runThread(self, thread, target):
 
