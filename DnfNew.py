@@ -60,8 +60,7 @@ class MainWindow(QWidget):
         gl._init_cache()
 
     def testCurrent(self):
-        # self.currentThread = self.runThread(self.currentThread, lambda: self.currentThreadTarget(self.currentItem),
-        mylog(self.model.dm, self.loginThreadTarget.__name__)
+        self.currentThread = self.runThread(self.currentThread, self.currentThreadTarget)
 
     def start(self, admin=None):
         mylog(self.model.dm, "start")
@@ -146,10 +145,13 @@ class MainWindow(QWidget):
             print(i)
             if (i != null and i.is_alive()):
                 self._async_raise(i.ident, SystemExit)
-        time.sleep(2) #防止没有杀干净，新进程起不来
+        for i in items:#杀多一次
+            print(i)
+            if (i != null and i.is_alive()):
+                self._async_raise(i.ident, SystemExit)
 
     def runThread(self, thread, target):
-
+        print("begin " + target.__name__)
         if (thread != null and thread.is_alive()):
             return thread  # 不重复开启线程
         print(target.__name__)

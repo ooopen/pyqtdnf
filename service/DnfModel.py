@@ -18,8 +18,8 @@ class DnfModel():
     currentItem = None
 
     IDs = [
-        {"idImg": "dnfimg/神的.bmp", "name": "无色小晶块", "min": 10, "buyPrice": 46, "sellPrice": 48},
-        {"idImg": "dnfimg/百思不得.bmp", "name": "无色小晶块", "min": 10, "buyPrice": 53, "sellPrice": 55}
+        {"idImg": "dnfimg/神的.bmp", "name": "无色小晶块", "min": 10, "buyPrice": 6, "addPrice": 40, "sellPrice": 48},
+        {"idImg": "dnfimg/百思不得.bmp", "name": "无色小晶块", "min": 10, "buyPrice": 3, "addPrice": 50, "sellPrice": 55}
     ]
 
     def __init__(self):
@@ -36,12 +36,12 @@ class DnfModel():
             self.dm.MoveWindow(hwnd, 0, 0)
             time.sleep(1)
 
-    def current(self, item):
-        self.dm.WriteFile("log.txt", "哈哈哈\r\n")
+    def current(self):
+        self.dm.MoveTo(596, 148)
 
     ###type=[login，exchangeId]
     def loginOrExchangeId(self, type="login"):
-
+        print(type)
         hwnd = FindWindow(self.dm, "WeGame", 1)
         if (hwnd == 0):
             type = "login"  # 防止wg已经退出的情况
@@ -88,10 +88,10 @@ class DnfModel():
         # 登录界面
         self.initWindow("WeGame", 10, 1)
         time.sleep(1)
-        ret = findPic(self.dm, "dnfimg/切换qq号.bmp", 50, 1, 773, 178, 852, 238)  # 找到登录界面
+        findColor(self.dm, 10, 1, 821, 218, "5f5f60-000000", 681, 335, "f2c113-000000")  # 找到登录界面
 
         if (type == "exchangeId"):
-            MoveTo(self.dm, ret[1], ret[2])
+            MoveTo(self.dm, 821, 218)
             time.sleep(0.1)
             LeftClick(self.dm)
             time.sleep(0.1)
@@ -150,14 +150,13 @@ class DnfModel():
         # 准备扫拍
         gl.set_value("spmPreThread", 1)
 
-
     def spmhPre(self):
 
         # 判断当前角色
         self.getMail()
         time.sleep(0.5)
         self.dm.KeyPress(77)
-        if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181,2,315,125)[0] == -1):
+        if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
             self.dm.KeyPress(77)
 
         time.sleep(1)
@@ -182,12 +181,14 @@ class DnfModel():
 
         # 判断金币是否充足，否则换角色
         ret = ocrJb(self.dm)  # 检查金币数量，金币不足上架
+        print(ret)
         gl.set_value("jbleft", ret)  # 为第一次购买成功计算依据
 
         if (ret != -1 and int(ret) > 5000000):
             mylog(self.dm, "金币充足，继续扫拍")
             # 继续扫拍
         else:
+            self.upSell()
             self.upSell()
             # 更换角色
             mylog(self.dm, "金币不足")
@@ -231,7 +232,6 @@ class DnfModel():
             myexit(self.dm, "currentItem为None")
         t1 = time.time()
         ret = ocrDj(self.dm)
-
         # 如果检测到物品价格低于预设，
         if (ret != -1 and int(ret) <= item['buyPrice']):
             # mylog(self.dm,"识别耗时："+str(time.time()-t1))
@@ -239,21 +239,21 @@ class DnfModel():
             self.dm.MoveTo(595, 151)
             self.dm.LeftClick()
             self.dm.KeyPress(13)
-            self.dm.KeyPress(13)
             t2 = time.time()
             msg = time.strftime("%H:%M:%S", time.localtime()) + "单价：" + ret + ";拍卖耗时：" + str(t2 - t1)
-            time.sleep(0.1)
 
             MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
-            time.sleep(0.01)
+            time.sleep(0.1)
             for i in range(2):
                 LeftClick(self.dm)
-                time.sleep(0.01)
+            time.sleep(0.1)
 
             self.dm.MoveTo(368, 548)  # 点击购买准备
+            time.sleep(0.1)
             self.dm.LeftCLick()
+            self.dm.LeftCLick()
+            time.sleep(0.1)
             self.dm.MoveTo(595, 141)  # 移回到价格tip
-
             gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 终极大招的判断依据
 
             retleft = ocrJb(self.dm)  # 检查金币数量，金币不足上架，换角色
@@ -264,12 +264,26 @@ class DnfModel():
             else:
                 gl.set_value("jbleft", retleft)
                 status = "成功"
-                num = (int(jbleft) - int(retleft)) / int(ret)
+                num = (int(jbleft) - int(retleft)) / (item['addPrice'] + int(ret))
             mylog(self.dm, msg + "=>" + "数量：" + str(num) + "|" + status)
 
             if (retleft != -1 and int(retleft) < 5000000):
                 mylog(self.dm, "金币不足")
                 gl.set_value("doBuyClickThreadError", 1)  # 金币不足触发上架判断
+
+        ts = time.strftime("%S", time.localtime())
+        if (int(ts)  == 50):#防不刷新
+            MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
+            time.sleep(0.1)
+            for i in range(2):
+                LeftClick(self.dm)
+            time.sleep(0.1)
+            self.dm.MoveTo(368, 548)  # 点击购买准备
+            time.sleep(0.1)
+            self.dm.LeftCLick()
+            self.dm.LeftCLick()
+            time.sleep(0.1)
+            self.dm.MoveTo(595, 141)  # 移回到价格tip
 
         if (ret == -1):
             mylog(self.dm, "识别单价失败")
@@ -278,8 +292,8 @@ class DnfModel():
     def getMail(self):
         self.clear()
         for i in range(10):
-            if (findPic(self.dm, "dnfimg/邮件.bmp", 10, 0, 685,463,801,541)[0] == 0):  # 如果有邮件
-                clickPic(self.dm, "dnfimg/邮件.bmp", 5, 0, 685,463,801,541)
+            if (findPic(self.dm, "dnfimg/邮件.bmp", 10, 0, 685, 463, 801, 541)[0] == 0):  # 如果有邮件
+                clickPic(self.dm, "dnfimg/邮件.bmp", 5, 0, 685, 463, 801, 541)
                 clickPic(self.dm, "dnfimg/选择接收.bmp", 5, 0, 232, 433, 348, 494)
                 time.sleep(0.5)
                 self.dm.KeyPress(27)  # 重置一下
@@ -298,14 +312,14 @@ class DnfModel():
         clickPic(self.dm, "dnfimg/上架拍卖品.bmp", 100, 0, 0, 508, 117, 591)
         time.sleep(1)
 
-        ret = findPic(self.dm, "dnfimg/装备栏.bmp", 100, 0, 401, 0, 710, 170)
+        ret = findPic(self.dm, "dnfimg/装备栏.bmp", 10, 0, 401, 0, 710, 170)
         if (ret[0] == 0):  # 为了点击材料栏
             MoveTo(self.dm, ret[1] + 25, ret[2] + 239)  # 点击材料栏
             time.sleep(0.1)
             LeftClick(self.dm)
             time.sleep(0.1)
 
-        ret = findPic(self.dm, "dnfimg/无色.bmp", 100, 0, 698, 312, 803, 470)
+        ret = findPic(self.dm, "dnfimg/无色.bmp", 10, 0, 698, 312, 803, 470)
         if (ret[0] == 0):  #
             MoveTo(self.dm, ret[1], ret[2])
             LeftDown(self.dm)
@@ -334,17 +348,30 @@ class DnfModel():
 
     def warnning(self):
 
-        file = "runtime" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
-        # 截图
-        self.dm.CaptureJpg(0, 0, 2000, 2000, "./screenshot/screen.jpg", 50)
-        mail1.send(subject='Test',
-                   text='This is a test!',
-                   recipients='375161864@qq.com',
-                   sender='1107769317@qq.com',
-                   username='1107769317@qq.com',
-                   password='mvbvvjyckktojegd',
-                   attachments={'screen.jpg': './screenshot/screen.jpg', 'log.txt': './log/' + file},
-                   smtp_host='smtp.qq.com')
+        #换武器
+        self.clear()
+        time.sleep(1)
+        color1 = self.dm.GetColor(9,583)
+        self.dm.KeyPress(49)  # 重置一下
+        time.sleep(1)
+        color2 = self.dm.GetColor(9,583)
+
+        if(color2 == color1):
+            file = "runtime" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
+            # 截图
+            self.dm.CaptureJpg(0, 0, 2000, 2000, "./screenshot/screen.jpg", 50)
+            mail1.send(subject='Test',
+                       text='This is a test!',
+                       recipients='375161864@qq.com',
+                       sender='1107769317@qq.com',
+                       username='1107769317@qq.com',
+                       password='mvbvvjyckktojegd',
+                       attachments={'screen.jpg': './screenshot/screen.jpg', 'log.txt': './log/' + file},
+                       smtp_host='smtp.qq.com')
+
+            mylog(self.dm, "终极大招检查失败")
+            gl.set_value("networkError", 1)
+
 
     def clear(self):
         self.initWindow()
