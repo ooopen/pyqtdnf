@@ -346,7 +346,7 @@ class DnfModel():
         te = int(time.time())
         ts = gl.get_cache("exchangeIdTime")
         if (ts != 0 and te - ts > 3600):
-            gl.set_cache("exchangeId", 0)
+            gl.set_cache("exchangeIdTime", 0)
             mylog(self.dm, "定时切换账号")
             gl.set_value("JbChangeId", 1)
             time.sleep(3)
@@ -487,9 +487,10 @@ class DnfModel():
                 ret1 = self.dm.Ocr(550, y1, 624, y2, "ffb500-000000|ff3131-000000", 0.9)  # 总价
                 y1 = y1 + 37.33333
                 y2 = y2 + 37.33333
-                ret2 = self.dm.Ocr(142, yy1, 173, yy2, "ffffff-000000", 0.9)  # 数量
+                ret2 = self.dm.Ocr(142, yy1, 173, yy2, "ffffff-000000|ffce31-000000", 0.9)  # 数量
                 yy1 = yy1 + 37.33333
                 yy2 = yy2 + 37.33333
+                print(ret1,ret2)
                 price = int(ret1) / int(ret2)
                 if (ret1 == "" or ret2 == "" or ins > 4):
                     break

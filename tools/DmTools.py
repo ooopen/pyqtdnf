@@ -117,7 +117,7 @@ def findColor(dm, num=10, iskill=0, x1=0, y1=0, color1="", x2=0, y2=0, color2=""
 def ocrDj(dm):
     i = 0
     while (i < 100):
-        ret = dm.Ocr(526, 139, 543, 148, "ffffff-000000", 1)
+        ret = dm.Ocr(526, 139, 543, 148, "ffffff-000000", 0.9)
         if ("" != ret):
             return ret
         else:
