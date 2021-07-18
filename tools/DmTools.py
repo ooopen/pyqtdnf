@@ -58,13 +58,13 @@ def clickPic(dm, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800):
     while (i < num):
         ret = dm.FindPic(x1, y1, x2, y2, img, "000000", 0.9, 0)
         if (-1 != ret[0]):
-            mylog(dm, time.strftime("%H:%M:%S", time.localtime()) + " success find：" + img)
+            mylog(dm, "success find：" + img)
             MoveTo(dm, ret[1], ret[2])
             LeftClick(dm)
             return
         else:
             i = i + 1
-    mylog(dm, time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + img)
+    mylog(dm, "fail to find：" + img)
     if (iskill == 1):
         myexit(dm, 1)
 
@@ -75,12 +75,12 @@ def findPic(dm, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800, color="00000
     while (i < num):
         ret = dm.FindPic(x1, y1, x2, y2, img, color, 0.9, 0)
         if (-1 != ret[0]):
-            mylog(dm, time.strftime("%H:%M:%S", time.localtime()) + " success find：" + img)
+            mylog(dm, "success find：" + img)
             return ret
         else:
             i = i + 1
             time.sleep(0.01)
-    mylog(dm, time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + img)
+    mylog(dm, "fail to find：" + img)
     if (iskill == 1):
         myexit(dm, 1)
     return ret
@@ -103,12 +103,12 @@ def findColor(dm, num=10, iskill=0, x1=0, y1=0, color1="", x2=0, y2=0, color2=""
         ret1 = dm.CmpColor(x1, y1, color1, 0.9)
         ret2 = dm.CmpColor(x2, y2, color2, 0.9)
         if (0 == ret1 and 0 == ret2):
-            mylog(dm, time.strftime("%H:%M:%S", time.localtime()) + " success find：" + color1 + "|" + color2)
+            mylog(dm, "success find：" + color1 + "|" + color2)
             return 0
         else:
             i = i + 1
             time.sleep(0.01)
-    mylog(dm, time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + color1 + "|" + color2)
+    mylog(dm, "fail to find：" + color1 + "|" + color2)
     if (iskill == 1):
         myexit(dm, 1)
     return -1
@@ -117,7 +117,7 @@ def findColor(dm, num=10, iskill=0, x1=0, y1=0, color1="", x2=0, y2=0, color2=""
 def ocrDj(dm):
     i = 0
     while (i < 100):
-        ret = dm.Ocr(536, 139, 543, 148, "ffffff-000000", 1)
+        ret = dm.Ocr(526, 139, 543, 148, "ffffff-000000", 1)
         if ("" != ret):
             return ret
         else:
@@ -174,12 +174,12 @@ def FindWindow(dm, title, num=20, iskill=0):
     while (i < num):
         ret = dm.FindWindow("", title)
         if (0 != ret):
-            mylog(dm, time.strftime("%H:%M:%S", time.localtime()) + " success find：" + title)
+            mylog(dm, "success find：" + title)
             return ret
         else:
             i = i + 1
             time.sleep(1)
-    mylog(dm, time.strftime("%H:%M:%S", time.localtime()) + " fail to find：" + title)
+    mylog(dm, "fail to find：" + title)
     if (iskill == 1):
         myexit(dm, "没有找到窗口" + title)
     return 0
@@ -219,9 +219,16 @@ def varname(p):
 
 
 def mylog(dm, msg):
+    msg = time.strftime("%H:%M:%S", time.localtime()) + ":" + str(msg)
     print(msg)
     file = "runtime" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
-    msg = time.strftime("%H:%M:%S", time.localtime()) + ":" + str(msg)
+    dm.WriteFile("log/" + file, msg + "\r\n")
+
+
+def mypricelog(dm, id, msg):
+    msg = time.strftime("%H:%M:%S", time.localtime()) + "-" + str(msg)
+    print(msg)
+    file = str(id)+"-" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
     dm.WriteFile("log/" + file, msg + "\r\n")
 
 
