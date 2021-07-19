@@ -17,15 +17,15 @@ class DnfModel():
 
     currentItem = None
 
-    product1 = {"name": "无色小晶块", "min": 10, "buyPrice": 46, "sellPrice": 48}
+    product1 = {"name": "无色小晶块", "min": 10, "buyPrice": 48, "sellPrice": 50}
     product2 = {"name": "无色小晶块", "min": 10, "buyPrice": 53, "sellPrice": 55}
 
     IDs = [
         {"id": 1, "idImg": "dnfimg/神的.bmp", "product": product1, "nextRole": None},
-        {"id": 1, "idImg": "dnfimg/php剑魂.bmp", "product": product1, "nextRole": {"x": 332, "y": 455}},
-        {"id": 1, "idImg": "dnfimg/杨雪舞.bmp", "product": product1, "nextRole": {"x": 463, "y": 460}},
-        {"id": 1, "idImg": "dnfimg/mc.bmp", "product": product1, "nextRole": {"x": 78, "y": 450}},
-        {"id": 2, "idImg": "dnfimg/百思不得.bmp", "product": product2, "nextRole": None},
+        # {"id": 1, "idImg": "dnfimg/php剑魂.bmp", "product": product1, "nextRole": {"x": 332, "y": 455}},
+        # {"id": 1, "idImg": "dnfimg/杨雪舞.bmp", "product": product1, "nextRole": {"x": 463, "y": 460}},
+        # {"id": 1, "idImg": "dnfimg/mc.bmp", "product": product1, "nextRole": {"x": 78, "y": 450}},
+        {"id": 2, "idImg": "dnfimg/百思不得.bmp", "product": product2, "nextRole": None}
     ]
 
     def __init__(self):
@@ -50,6 +50,11 @@ class DnfModel():
     ###type=[login，exchangeId]
     def loginOrExchangeId(self, type="login"):
         mylog(self.dm, type)
+
+        #切换前先上架
+        if(type == "exchangeId"):
+            self.upSell()
+
         hwnd = FindWindow(self.dm, "WeGame", 1)
         if (hwnd == 0):
             type = "login"  # 防止wg已经退出的情况
@@ -233,12 +238,14 @@ class DnfModel():
             else:
                 mylog(self.dm, "金币充足，继续扫拍")
         else:
-            self.upSell()
+
             # 更换角色
             mylog(self.dm, "金币不足")
             mylog(self.dm, self.currentItem['nextRole'])
             if (self.currentItem['nextRole'] == None):
-                mylog(self.dm, 1)
+
+                #由于金币不足导致的切换，重置切换时间
+                gl.set_cache("exchangeIdTime", 0)
                 gl.set_value("JbChangeId", 1)
             else:
                 mylog(self.dm, 2)
