@@ -15,9 +15,11 @@ import GlobalVar as gl
 class DnfModel():
     dm = None
 
+    cPrice = 300*10000
+
     currentItem = None
 
-    product1 = {"name": "无色小晶块", "min": 10, "buyPrice": 48, "sellPrice": 50}
+    product1 = {"name": "无色小晶块", "min": 10, "buyPrice": 40, "sellPrice": 42}
     product2 = {"name": "无色小晶块", "min": 10, "buyPrice": 53, "sellPrice": 55}
 
     IDs = [
@@ -45,14 +47,14 @@ class DnfModel():
     def current(self):
         self.initWindow()
         time.sleep(1)
-        self.coutSell()
+        self.changePrice()
 
     ###type=[login，exchangeId]
     def loginOrExchangeId(self, type="login"):
         mylog(self.dm, type)
 
-        #切换前先上架
-        if(type == "exchangeId"):
+        # 切换前先上架
+        if (type == "exchangeId"):
             self.upSell()
 
         hwnd = FindWindow(self.dm, "WeGame", 1)
@@ -168,6 +170,13 @@ class DnfModel():
         # 统计拍卖行行情
         self.coutSell()
 
+
+        #还原加价标识，防止影响到其他角色或场景
+        gl.set_cache("changePrice", False)
+
+        gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
+
+
         time.sleep(25)
         # 准备扫拍
         gl.set_value("spmPreThread", 1)
@@ -233,8 +242,8 @@ class DnfModel():
             # 金币不足，扫低价
             if (int(ret) < 10000000):
                 mylog(self.dm, "金币较少，低价扫拍")
-                #time.sleep(100)
-                #self.currentItem['buyPrice'] = self.currentItem['buyPrice'] - 1
+                # time.sleep(100)
+                # self.currentItem['buyPrice'] = self.currentItem['buyPrice'] - 1
             else:
                 mylog(self.dm, "金币充足，继续扫拍")
         else:
@@ -244,7 +253,7 @@ class DnfModel():
             mylog(self.dm, self.currentItem['nextRole'])
             if (self.currentItem['nextRole'] == None):
 
-                #由于金币不足导致的切换，重置切换时间
+                # 由于金币不足导致的切换，重置切换时间
                 gl.set_cache("exchangeIdTime", 0)
                 gl.set_value("JbChangeId", 1)
             else:
@@ -285,8 +294,18 @@ class DnfModel():
 
     def doBuyClick(self):
         item = self.currentItem
+        print(item)
+        print(1)
+        print(self.currentItem)
+        print(2)
         if (item == None):
             myexit(self.dm, "currentItem为None")
+
+        #加价逻辑
+        if(gl.get_cache("changePrice") == True):
+            item['buyPrice'] = item['buyPrice']+1
+        print(item)
+
         t1 = time.time()
         ret = ocrDj(self.dm)
         # 如果检测到物品价格低于预设，
@@ -369,10 +388,31 @@ class DnfModel():
             else:
                 break
 
+    def changePrice(self):
+        arr = self.coutSell()
+
+        newPrice = self.currentItem['sellPrice'] + 1
+        count = 0
+        for k, v in arr.items():
+            if (k <= newPrice):
+                count = count + v
+        if (count < self.cPrice):
+            mylog(self.dm, "目前售价为：" + str(self.currentItem['sellPrice']) + ",当前售卖价不大于" + str(newPrice) + "的数量有：" + str(
+                count) + ",价格+1")
+            gl.set_cache("changePrice", True)
+        else:
+            mylog(self.dm, "目前售价为：" + str(self.currentItem['sellPrice']) + ",当前售卖价不大于" + str(newPrice) + "的数量有：" + str(
+                count) + ",不符合加价条件")
+            gl.set_cache("changePrice", False)
+
     def upSell(self):
         item = self.currentItem
         if (item == None):
             myexit(self.dm, "currentItem为None")
+            #加价逻辑
+        if(gl.get_cache("changePrice") == True):
+            item['sellPrice'] = item['sellPrice']+1
+
         self.clear()
         if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
             self.dm.KeyPress(76)
@@ -478,9 +518,7 @@ class DnfModel():
             time.sleep(0.01)
         SendString(self.dm, self.currentItem['name'])
         clickPic(self.dm, "dnfimg/搜索.bmp", 300, 1, 627, 69, 686, 109)
-        self.dm.MoveTo(368, 548)  # 点击购买准备
-        self.dm.LeftCLick()
-        MoveTo(self.dm, 595, 141)  # 移动到价格tip
+        time.sleep(1)
         count = 0
         curprice = 0
         arr = {}
@@ -497,8 +535,7 @@ class DnfModel():
                 ret2 = self.dm.Ocr(142, yy1, 173, yy2, "ffffff-000000|ffce31-000000", 0.9)  # 数量
                 yy1 = yy1 + 37.33333
                 yy2 = yy2 + 37.33333
-                print(ret1,ret2)
-                price = int(ret1) / int(ret2)
+                price = int(int(ret1) / int(ret2))
                 if (ret1 == "" or ret2 == "" or ins > 4):
                     break
 
@@ -516,7 +553,7 @@ class DnfModel():
             self.dm.KeyPress(113)
             time.sleep(1)
         mypricelog(self.dm, self.currentItem['id'], arr)
-        return (arr)
+        return arr
 
     def clear(self):
         self.initWindow()

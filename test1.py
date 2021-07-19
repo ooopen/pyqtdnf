@@ -1,12 +1,12 @@
-import mail1
 
+class a():
 
+    curritem = {"num":1}
 
-arr = {"a","b"}
+    def test(self):
+        for i in range(10):
+            item = self.curritem
+            item['num'] =  self.curritem['num']+1
+            print(item)
 
-
-c = arr.items()
-
-
-for  b in c:
-    print(b)
+a().test()

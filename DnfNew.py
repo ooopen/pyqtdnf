@@ -37,6 +37,7 @@ class MainWindow(QWidget):
     currentThread = null
 
     checkTime = 60 * 30  # 自检时间间隔
+    checkPriceTime = 1 * 30  # 长时间没有试图购买，触发加价逻辑判断
 
     # 界面配置信息，先写死
 
@@ -65,6 +66,13 @@ class MainWindow(QWidget):
     def start(self, admin=None):
         mylog(self.model.dm, "start")
 
+        #还原加价标识，防止影响到其他角色或场景
+        gl.set_cache("changePrice", False)
+        gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
+
+        #还原加价标识，防止影响到其他角色或场景
+        gl.set_cache("changePrice", False)
+
         self.demonThread = self.runThread(self.demonThread, self.demonThreadTarget)
         self.threadControlThread = self.runThread(self.threadControlThread, self.threadControlThreadTarget)
 
@@ -80,6 +88,7 @@ class MainWindow(QWidget):
         self.model.exchangeRole()
 
     def exchangeIdThreadTarget(self):
+
         self.model.loginOrExchangeId("exchangeId")
 
     def spmPreThreadTarget(self):
@@ -131,6 +140,19 @@ class MainWindow(QWidget):
                 mylog(self.model.dm, "networkError")
                 self.stop()
                 gl.set_value("loginThread", 1)
+
+
+            # 加价逻辑，以试图抢购为依据，如果长时间没有抢购，触发加价判断
+            # stime = gl.get_cache("lastTryDoBuyClickTime")
+            # etime = int(time.time())
+            # if (stime != 0 and etime - stime > self.checkPriceTime and etime - stime < self.checkPriceTime + 2):
+            #     mylog(self.model.dm, "触发加价判断")
+            #     self.stop()
+            #
+            #     self.model.changePrice()
+            #
+            #     gl.set_value("spmPreThread", 1)
+            #     time.sleep(3)
 
             # 终极大招，以试图抢购为依据，判断物价过高，或者金币不足，或者脚本异常,发邮件告警。
             stime = gl.get_cache("lastTryDoBuyClickTime")
