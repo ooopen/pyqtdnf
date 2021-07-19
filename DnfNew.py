@@ -60,8 +60,7 @@ class MainWindow(QWidget):
         gl._init_cache()
 
     def testCurrent(self):
-        # self.currentThread = self.runThread(self.currentThread, lambda: self.currentThreadTarget(self.currentItem),
-        mylog(self.model.dm, self.loginThreadTarget.__name__)
+        self.currentThread = self.runThread(self.currentThread, self.currentThreadTarget)
 
     def start(self, admin=None):
         mylog(self.model.dm, "start")
@@ -77,10 +76,16 @@ class MainWindow(QWidget):
     def loginThreadTarget(self):
         self.model.loginOrExchangeId("login")
 
+    def exchangeRoleThreadTarget(self):
+        self.model.exchangeRole()
+
     def exchangeIdThreadTarget(self):
         self.model.loginOrExchangeId("exchangeId")
 
     def spmPreThreadTarget(self):
+        st = gl.get_cache("exchangeIdTime")
+        if (st == 0):
+            gl.set_cache("exchangeIdTime", int(time.time()))
         self.model.spmhPre()
 
     def spmSearchThreadTarget(self):
@@ -96,7 +101,8 @@ class MainWindow(QWidget):
 
     def threadControlThreadTarget(self):
 
-        arr = ["loginThread", "exchangeIdThread", "spmPreThread", "spmSearchThread", "doBuyClickThread"]
+        arr = ["loginThread", "exchangeRoleThread", "exchangeIdThread", "spmPreThread", "spmSearchThread",
+               "doBuyClickThread"]
 
         while (1):
             for item in arr:
@@ -111,10 +117,15 @@ class MainWindow(QWidget):
                 self.stop()
                 gl.set_value("spmPreThread", 1)
 
-            if (gl.get_value("JbIsNotEnoughError") == 1):  # 换角色
-                mylog(self.model.dm, "JbIsNotEnoughError")
+            if (gl.get_value("JbChangeId") == 1):  # 换id
+                mylog(self.model.dm, "JbChangeId")
                 self.stop()
                 gl.set_value("exchangeIdThread", 1)
+
+            if (gl.get_value("JbChangeRole") == 1):  # 换role
+                mylog(self.model.dm, "JbChangeRole")
+                self.stop()
+                gl.set_value("exchangeRoleThread", 1)
 
             if (gl.get_value("networkError") == 1):  # 网络错误，直接重启
                 mylog(self.model.dm, "networkError")
@@ -138,21 +149,25 @@ class MainWindow(QWidget):
             items = [self.loginThread, self.spmPreThread, self.spmSearchThread, self.doBuyClickThread,
                      self.currentThread, self.exchangeIdThread]
         if (items == "admin"):
-            items = [self.loginThread, self.spmPreThread, self.spmSearchThread, self.doBuyClickThread,
-                     self.currentThread, self.exchangeIdThread, self.threadControlThread,
-                     self.demonThread]
+            items = [self.demonThread, self.threadControlThread, self.loginThread, self.spmPreThread,
+                     self.spmSearchThread, self.doBuyClickThread,
+                     self.currentThread, self.exchangeIdThread
+                     ]
 
         for i in items:
-            print(i)
+            mylog(self.model.dm, i)
             if (i != null and i.is_alive()):
                 self._async_raise(i.ident, SystemExit)
-        time.sleep(2) #防止没有杀干净，新进程起不来
+        for i in items:  # 杀多一次
+            mylog(self.model.dm, i)
+            if (i != null and i.is_alive()):
+                self._async_raise(i.ident, SystemExit)
 
     def runThread(self, thread, target):
-
+        mylog(self.model.dm, "begin " + target.__name__)
         if (thread != null and thread.is_alive()):
             return thread  # 不重复开启线程
-        print(target.__name__)
+        mylog(self.model.dm, target.__name__)
         thread = Thread(target=target, name=target.__name__,
                         args=()  # 元组
                         )

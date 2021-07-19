@@ -8,10 +8,8 @@ gl._init_cache()
 gl.set_cache("lastTryDoBuyClickTime",int(time.time()))
 
 
-time.sleep(3)
+a= {0: 0, 47.0: 17113, 48.0: 10281928, 49.0: 11265925}
 
-
-stime = gl.get_cache("lastTryDoBuyClickTime")
-etime = int(time.time())
-if(etime - stime > 2):
-    print("抢购异常")
+for k,b in a.items():
+    print(k)
+    print(b)
