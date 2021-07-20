@@ -37,7 +37,7 @@ class MainWindow(QWidget):
     currentThread = null
 
     checkTime = 60 * 30  # 自检时间间隔
-    checkPriceTime = 1 * 30  # 长时间没有试图购买，触发加价逻辑判断
+    checkPriceTime = 10 * 30  # 长时间没有试图购买，触发加价逻辑判断
 
     # 界面配置信息，先写死
 
@@ -143,16 +143,16 @@ class MainWindow(QWidget):
 
 
             # 加价逻辑，以试图抢购为依据，如果长时间没有抢购，触发加价判断
-            # stime = gl.get_cache("lastTryDoBuyClickTime")
-            # etime = int(time.time())
-            # if (stime != 0 and etime - stime > self.checkPriceTime and etime - stime < self.checkPriceTime + 2):
-            #     mylog(self.model.dm, "触发加价判断")
-            #     self.stop()
-            #
-            #     self.model.changePrice()
-            #
-            #     gl.set_value("spmPreThread", 1)
-            #     time.sleep(3)
+            stime = gl.get_cache("lastTryDoBuyClickTime")
+            etime = int(time.time())
+            if (stime != 0 and etime - stime > self.checkPriceTime and etime - stime < self.checkPriceTime + 2):
+                mylog(self.model.dm, "触发加价判断")
+                self.stop()
+
+                self.model.changePrice()
+
+                gl.set_value("spmPreThread", 1)
+                time.sleep(3)
 
             # 终极大招，以试图抢购为依据，判断物价过高，或者金币不足，或者脚本异常,发邮件告警。
             stime = gl.get_cache("lastTryDoBuyClickTime")
