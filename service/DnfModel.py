@@ -21,7 +21,7 @@ class DnfModel():
 
     product1 = {"name": "无色小晶块", "min": 10, "buyPrice": 51, "sellPrice": 53}
     product2 = {"name": "无色小晶块", "min": 10, "buyPrice": 54, "sellPrice": 56}
-    product3 = {"name": "无色小晶块", "min": 10, "buyPrice": 66, "sellPrice": 68}
+    product3 = {"name": "无色小晶块", "min": 10, "buyPrice": 67, "sellPrice": 69}
 
     IDs = [
         {"id": 1, "idImg": "dnfimg/神的.bmp", "product": product1, "nextRole": None},
@@ -158,19 +158,18 @@ class DnfModel():
         clickPic(self.dm, "dnfimg/wg地下城.bmp", 50, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/协议.bmp", 50, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/启动.bmp", 50, 1, 0, 0, 1300, 1200)
-        time.sleep(30)
+        time.sleep(20)
         self.initWindow("地下城与勇士", 30)
-        time.sleep(1)
-        findPic(self.dm, "dnfimg/游戏开始.bmp", 2000, 1)
+        time.sleep(10)
+        findPic(self.dm, "dnfimg/游戏开始.bmp", 4000, 1)
         time.sleep(1)
         MoveTo(self.dm, 67, 443)  # 默认第一个角色
         time.sleep(1)
         LeftClick(self.dm)
-        LeftClick(self.dm)
         MoveTo(self.dm, 410, 570)
         LeftClick(self.dm)  # 防止没点到开始
         LeftClick(self.dm)  # 防止没点到开始
-        time.sleep(20)
+        time.sleep(10)
         findPic(self.dm, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
         # 统计拍卖行行情
         self.coutSell()
