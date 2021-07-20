@@ -210,7 +210,7 @@ class DnfModel():
         # 判断当前角色
         self.getMail()
         time.sleep(0.5)
-        if (gl.get_value("isfirstcome") == True):  # 第一次才执行
+        if (gl.get_cache("isfirstcome") == True):  # 第一次才执行
             gl.set_cache("isfirstcome", False)
             self.dm.KeyPress(77)
             if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
