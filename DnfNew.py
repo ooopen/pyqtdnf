@@ -36,8 +36,8 @@ class MainWindow(QWidget):
 
     currentThread = null
 
-    checkTime = 60 * 30  # 自检时间间隔
-    checkPriceTime = 10 * 30  # 长时间没有试图购买，触发加价逻辑判断
+    checkTime = 60 * 60  # 自检时间间隔
+    checkPriceTime = 10 * 60  # 长时间没有试图购买，触发加价逻辑判断
 
     # 界面配置信息，先写死
 
