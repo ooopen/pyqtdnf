@@ -21,7 +21,7 @@ class DnfModel():
 
     product1 = {"name": "无色小晶块", "min": 10, "buyPrice": 51, "sellPrice": 53}
     product2 = {"name": "无色小晶块", "min": 10, "buyPrice": 54, "sellPrice": 56}
-    product3 = {"name": "无色小晶块", "min": 10, "buyPrice": 65, "sellPrice": 67}
+    product3 = {"name": "无色小晶块", "min": 10, "buyPrice": 66, "sellPrice": 68}
 
     IDs = [
         {"id": 1, "idImg": "dnfimg/神的.bmp", "product": product1, "nextRole": None},
@@ -115,7 +115,7 @@ class DnfModel():
             time.sleep(0.1)
             LeftClick(self.dm)
             time.sleep(0.1)
-            self.dm.WheelDown()#滚动到最后一个
+            self.dm.WheelDown()  # 滚动到最后一个
             time.sleep(0.1)
             MoveTo(self.dm, 739, 312)  # TODO 后续这里考虑做成动态的
             LeftClick(self.dm)
@@ -180,6 +180,8 @@ class DnfModel():
 
         gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
 
+        gl.set_cache("isfirstcome", True)  # 表面第一次进游戏
+
         time.sleep(15)
         # 准备扫拍
         gl.set_value("spmPreThread", 1)
@@ -208,29 +210,31 @@ class DnfModel():
         # 判断当前角色
         self.getMail()
         time.sleep(0.5)
-        self.dm.KeyPress(77)
-        if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
+        if (gl.get_value("isfirstcome") == True):  # 第一次才执行
+            gl.set_cache("isfirstcome", False)
             self.dm.KeyPress(77)
+            if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
+                self.dm.KeyPress(77)
 
-        time.sleep(1)
-        for index in range(len(self.IDs)):
-            if (findPic(self.dm, self.IDs[index]['idImg'], 10, 0, 156, 204, 344, 303)[0] == 0):
-                self.currentItem = self.IDs[index]['product']
-                self.currentItem['nextRole'] = self.IDs[index]['nextRole']
-                self.currentItem['id'] = self.IDs[index]['id']
+            time.sleep(1)
+            for index in range(len(self.IDs)):
+                if (findPic(self.dm, self.IDs[index]['idImg'], 10, 0, 156, 204, 344, 303)[0] == 0):
+                    self.currentItem = self.IDs[index]['product']
+                    self.currentItem['nextRole'] = self.IDs[index]['nextRole']
+                    self.currentItem['id'] = self.IDs[index]['id']
 
-                mylog(self.dm, self.currentItem)
-                mylog(self.dm, "current id is " + self.IDs[index]['idImg'])
-                break
-            if (index + 1 == len(self.IDs)):
-                mylog(self.dm, "id is not found")
-                gl.set_value("networkError", 1)
-                return
-        if (self.currentItem == None):
-            myexit(self.dm, "currentItem为None")
+                    mylog(self.dm, self.currentItem)
+                    mylog(self.dm, "current id is " + self.IDs[index]['idImg'])
+                    break
+                if (index + 1 == len(self.IDs)):
+                    mylog(self.dm, "id is not found")
+                    gl.set_value("networkError", 1)
+                    return
+            if (self.currentItem == None):
+                myexit(self.dm, "currentItem为None")
 
-        self.dm.KeyPress(77)  # 关闭角色信息
-        time.sleep(0.5)
+            self.dm.KeyPress(77)  # 关闭角色信息
+            time.sleep(0.5)
 
         self.dm.KeyPress(76)
         time.sleep(1)

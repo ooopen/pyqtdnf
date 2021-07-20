@@ -70,6 +70,8 @@ class MainWindow(QWidget):
         gl.set_cache("changePrice", False)
         gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
 
+        gl.set_cache("isfirstcome", True)  # 表面第一次进游戏
+
         #还原加价标识，防止影响到其他角色或场景
         gl.set_cache("changePrice", False)
 
