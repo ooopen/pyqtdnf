@@ -1,15 +1,11 @@
-import time
+curritem = {'name': '无色小晶块', 'min': 10, 'buyPrice': 50, 'sellPrice': 52, 'nextRole': None, 'id': 1}
 
-import GlobalVar as gl
+for i in range(10):
+    print(curritem)
+    item = curritem.items()
+    item2 = {}
+    for k,v in item:
+        item2[k] = v
+    item2['sellPrice'] = item2['sellPrice'] + 1
 
-
-gl._init_cache()
-
-gl.set_cache("lastTryDoBuyClickTime",int(time.time()))
-
-
-a= {0: 0, 47.0: 17113, 48.0: 10281928, 49.0: 11265925}
-
-for k,b in a.items():
-    print(k)
-    print(b)
+print(item2)

@@ -15,24 +15,29 @@ import GlobalVar as gl
 class DnfModel():
     dm = None
 
+    cPrice = 100 * 10000
+
     currentItem = None
 
-    product1 = {"name": "无色小晶块", "min": 10, "buyPrice": 46, "sellPrice": 48}
-    product2 = {"name": "无色小晶块", "min": 10, "buyPrice": 53, "sellPrice": 55}
+    product1 = {"name": "无色小晶块", "min": 10, "buyPrice": 51, "sellPrice": 53}
+    product2 = {"name": "无色小晶块", "min": 10, "buyPrice": 54, "sellPrice": 56}
+    product3 = {"name": "无色小晶块", "min": 10, "buyPrice": 67, "sellPrice": 69}
 
     IDs = [
         {"id": 1, "idImg": "dnfimg/神的.bmp", "product": product1, "nextRole": None},
-        {"id": 1, "idImg": "dnfimg/php剑魂.bmp", "product": product1, "nextRole": {"x": 332, "y": 455}},
-        {"id": 1, "idImg": "dnfimg/杨雪舞.bmp", "product": product1, "nextRole": {"x": 463, "y": 460}},
-        {"id": 1, "idImg": "dnfimg/mc.bmp", "product": product1, "nextRole": {"x": 78, "y": 450}},
+        # {"id": 1, "idImg": "dnfimg/php剑魂.bmp", "product": product1, "nextRole": {"x": 332, "y": 455}},
+        # {"id": 1, "idImg": "dnfimg/杨雪舞.bmp", "product": product1, "nextRole": {"x": 463, "y": 460}},
+        # {"id": 1, "idImg": "dnfimg/mc.bmp", "product": product1, "nextRole": {"x": 78, "y": 450}},
         {"id": 2, "idImg": "dnfimg/百思不得.bmp", "product": product2, "nextRole": None},
+        {"id": 3, "idImg": "dnfimg/探险记.bmp", "product": product3, "nextRole": None},
+        {"id": 4, "idImg": "dnfimg/屠夫.bmp", "product": product1, "nextRole": None},
     ]
 
     def __init__(self):
         self.dm = noRegsvr()
         # self.dm = noRegsvrVip()
-        # self.dm.SetKeypadDelay("normal", 10)
-        # self.dm.SetMouseDelay("normal", 10)
+        self.dm.SetKeypadDelay("normal", 10)
+        self.dm.SetMouseDelay("normal", 10)
 
     def initWindow(self, title="地下城与勇士", num=4, isKill=0):
 
@@ -50,6 +55,11 @@ class DnfModel():
     ###type=[login，exchangeId]
     def loginOrExchangeId(self, type="login"):
         mylog(self.dm, type)
+
+        # 切换前先上架
+        if (type == "exchangeId"):
+            self.upSell()
+
         hwnd = FindWindow(self.dm, "WeGame", 1)
         if (hwnd == 0):
             type = "login"  # 防止wg已经退出的情况
@@ -105,7 +115,9 @@ class DnfModel():
             time.sleep(0.1)
             LeftClick(self.dm)
             time.sleep(0.1)
-            MoveTo(self.dm, 739, 273)  # TODO 后续这里考虑做成动态的
+            self.dm.WheelDown()  # 滚动到最后一个
+            time.sleep(0.1)
+            MoveTo(self.dm, 739, 312)  # TODO 后续这里考虑做成动态的
             LeftClick(self.dm)
             time.sleep(0.1)
         MoveTo(self.dm, 744, 327)
@@ -146,14 +158,13 @@ class DnfModel():
         clickPic(self.dm, "dnfimg/wg地下城.bmp", 50, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/协议.bmp", 50, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/启动.bmp", 50, 1, 0, 0, 1300, 1200)
-        time.sleep(30)
+        time.sleep(20)
         self.initWindow("地下城与勇士", 30)
-        time.sleep(1)
-        findPic(self.dm, "dnfimg/游戏开始.bmp", 2000, 1)
+        time.sleep(10)
+        findPic(self.dm, "dnfimg/游戏开始.bmp", 4000, 1)
         time.sleep(1)
         MoveTo(self.dm, 67, 443)  # 默认第一个角色
         time.sleep(1)
-        LeftClick(self.dm)
         LeftClick(self.dm)
         MoveTo(self.dm, 410, 570)
         LeftClick(self.dm)  # 防止没点到开始
@@ -163,7 +174,14 @@ class DnfModel():
         # 统计拍卖行行情
         self.coutSell()
 
-        time.sleep(25)
+        # 还原加价标识，防止影响到其他角色或场景
+        gl.set_cache("changePrice", False)
+
+        gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
+
+        gl.set_cache("isfirstcome", True)  # 表面第一次进游戏
+
+        time.sleep(15)
         # 准备扫拍
         gl.set_value("spmPreThread", 1)
 
@@ -191,29 +209,31 @@ class DnfModel():
         # 判断当前角色
         self.getMail()
         time.sleep(0.5)
-        self.dm.KeyPress(77)
-        if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
+        if (gl.get_cache("isfirstcome") == True):  # 第一次才执行
+            gl.set_cache("isfirstcome", False)
             self.dm.KeyPress(77)
+            if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
+                self.dm.KeyPress(77)
 
-        time.sleep(1)
-        for index in range(len(self.IDs)):
-            if (findPic(self.dm, self.IDs[index]['idImg'], 10, 0, 156, 204, 344, 303)[0] == 0):
-                self.currentItem = self.IDs[index]['product']
-                self.currentItem['nextRole'] = self.IDs[index]['nextRole']
-                self.currentItem['id'] = self.IDs[index]['id']
+            time.sleep(1)
+            for index in range(len(self.IDs)):
+                if (findPic(self.dm, self.IDs[index]['idImg'], 10, 0, 156, 204, 344, 303)[0] == 0):
+                    self.currentItem = self.IDs[index]['product']
+                    self.currentItem['nextRole'] = self.IDs[index]['nextRole']
+                    self.currentItem['id'] = self.IDs[index]['id']
 
-                mylog(self.dm, self.currentItem)
-                mylog(self.dm, "current id is " + self.IDs[index]['idImg'])
-                break
-            if (index + 1 == len(self.IDs)):
-                mylog(self.dm, "id is not found")
-                gl.set_value("spmPreThread", 1)
-                return
-        if (self.currentItem == None):
-            myexit(self.dm, "currentItem为None")
+                    mylog(self.dm, self.currentItem)
+                    mylog(self.dm, "current id is " + self.IDs[index]['idImg'])
+                    break
+                if (index + 1 == len(self.IDs)):
+                    mylog(self.dm, "id is not found")
+                    gl.set_value("networkError", 1)
+                    return
+            if (self.currentItem == None):
+                myexit(self.dm, "currentItem为None")
 
-        self.dm.KeyPress(77)  # 关闭角色信息
-        time.sleep(0.5)
+            self.dm.KeyPress(77)  # 关闭角色信息
+            time.sleep(0.5)
 
         self.dm.KeyPress(76)
         time.sleep(1)
@@ -228,17 +248,19 @@ class DnfModel():
             # 金币不足，扫低价
             if (int(ret) < 10000000):
                 mylog(self.dm, "金币较少，低价扫拍")
-                #time.sleep(100)
-                #self.currentItem['buyPrice'] = self.currentItem['buyPrice'] - 1
+                # time.sleep(100)
+                # self.currentItem['buyPrice'] = self.currentItem['buyPrice'] - 1
             else:
                 mylog(self.dm, "金币充足，继续扫拍")
         else:
-            self.upSell()
+
             # 更换角色
             mylog(self.dm, "金币不足")
             mylog(self.dm, self.currentItem['nextRole'])
             if (self.currentItem['nextRole'] == None):
-                mylog(self.dm, 1)
+
+                # 由于金币不足导致的切换，重置切换时间
+                gl.set_cache("exchangeIdTime", 0)
                 gl.set_value("JbChangeId", 1)
             else:
                 mylog(self.dm, 2)
@@ -277,9 +299,20 @@ class DnfModel():
         self.dm.KeyPress(13)
 
     def doBuyClick(self):
-        item = self.currentItem
+        item2 = self.currentItem
+        if (item2 == None):
+            myexit(self.dm, "currentItem为None")
+        item = {}
+        for k, v in item2.items():
+            item[k] = v
+
         if (item == None):
             myexit(self.dm, "currentItem为None")
+
+        # #加价逻辑
+        if (gl.get_cache("changePrice") == True):
+            item['buyPrice'] = item['buyPrice'] + 1
+
         t1 = time.time()
         ret = ocrDj(self.dm)
         # 如果检测到物品价格低于预设，
@@ -301,13 +334,14 @@ class DnfModel():
                 LeftClick(self.dm)
             time.sleep(0.1)
 
-            self.dm.MoveTo(368, 548)  # 点击购买准备
+            MoveTo(self.dm, 368, 548)  # 点击购买准备
+            self.dm.RightCLick()
+            time.sleep(0.2)
+            self.dm.RightCLick()
             self.dm.LeftCLick()
-            self.dm.LeftCLick()
-            self.dm.LeftCLick()
+            time.sleep(0.2)
             self.dm.LeftCLick()
             self.dm.MoveTo(595, 141)  # 移回到价格tip
-            gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 终极大招的判断依据
 
             retleft = ocrJb(self.dm)  # 检查金币数量，金币不足上架，换角色
             jbleft = gl.get_value("jbleft")
@@ -315,6 +349,7 @@ class DnfModel():
                 status = "失败"
                 num = "未知"
             else:
+                gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 终极大招和涨价的判断依据
                 gl.set_value("jbleft", retleft)
                 status = "成功"
                 num = (int(jbleft) - int(retleft)) / int(ret)
@@ -324,24 +359,19 @@ class DnfModel():
                 mylog(self.dm, "金币不足")
                 gl.set_value("doBuyClickThreadError", 1)  # 金币不足触发上架判断
 
-        ts = time.strftime("%S", time.localtime())
-        if (int(ts) == 50):  # 防不刷新
-            MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
-            time.sleep(0.1)
-            for i in range(2):
-                LeftClick(self.dm)
-            time.sleep(0.1)
-            self.dm.MoveTo(368, 548)  # 点击购买准备
-            self.dm.LeftCLick()
-            self.dm.LeftCLick()
-            self.dm.LeftCLick()
-            self.dm.LeftCLick()
-            self.dm.MoveTo(595, 141)  # 移回到价格tip
-
         if (ret == -1):
             mylog(self.dm, "识别单价失败")
             gl.set_value("doBuyClickThreadError", 1)
             time.sleep(3)
+
+        # 定时重启拍卖行，防止鼠标点击问题
+        tm = time.strftime("%M", time.localtime())
+        ts = time.strftime("%S", time.localtime())
+        if (int(tm) % 11 == 0 and int(ts) < 3):
+            mylog(self.dm, "定时重启拍卖行，防止鼠标点击问题")
+            gl.set_value("doBuyClickThreadError", 1)
+            time.sleep(3)
+
         # 定时切换不同账号
         te = int(time.time())
         ts = gl.get_cache("exchangeIdTime")
@@ -362,10 +392,37 @@ class DnfModel():
             else:
                 break
 
+    def changePrice(self):
+        arr = self.coutSell()
+
+        newPrice = self.currentItem['sellPrice'] + 1
+        count = 0
+        for k, v in arr.items():
+            if (k <= newPrice):
+                count = count + v
+        if (count == 0):
+            return
+        if (count < self.cPrice):
+            mylog(self.dm, "目前售价为：" + str(self.currentItem['sellPrice']) + ",当前售卖价不大于" + str(newPrice) + "的数量有：" + str(
+                count) + ",价格+1")
+            gl.set_cache("changePrice", True)
+        else:
+            mylog(self.dm, "目前售价为：" + str(self.currentItem['sellPrice']) + ",当前售卖价不大于" + str(newPrice) + "的数量有：" + str(
+                count) + ",不符合加价条件")
+            gl.set_cache("changePrice", False)
+
     def upSell(self):
-        item = self.currentItem
-        if (item == None):
+        item2 = self.currentItem
+        item = {}
+        for k, v in item2.items():
+            item[k] = v
+
+        if (item2 == None):
             myexit(self.dm, "currentItem为None")
+            # 加价逻辑
+        if (gl.get_cache("changePrice") == True):
+            item['sellPrice'] = item['sellPrice'] + 1
+
         self.clear()
         if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
             self.dm.KeyPress(76)
@@ -471,9 +528,7 @@ class DnfModel():
             time.sleep(0.01)
         SendString(self.dm, self.currentItem['name'])
         clickPic(self.dm, "dnfimg/搜索.bmp", 300, 1, 627, 69, 686, 109)
-        self.dm.MoveTo(368, 548)  # 点击购买准备
-        self.dm.LeftCLick()
-        MoveTo(self.dm, 595, 141)  # 移动到价格tip
+        time.sleep(1)
         count = 0
         curprice = 0
         arr = {}
@@ -490,8 +545,9 @@ class DnfModel():
                 ret2 = self.dm.Ocr(142, yy1, 173, yy2, "ffffff-000000|ffce31-000000", 0.9)  # 数量
                 yy1 = yy1 + 37.33333
                 yy2 = yy2 + 37.33333
-                print(ret1,ret2)
-                price = int(ret1) / int(ret2)
+                if (ret1 == "" or ret2 == ""):
+                    break
+                price = int(int(ret1) / int(ret2))
                 if (ret1 == "" or ret2 == "" or ins > 4):
                     break
 
@@ -509,7 +565,7 @@ class DnfModel():
             self.dm.KeyPress(113)
             time.sleep(1)
         mypricelog(self.dm, self.currentItem['id'], arr)
-        return (arr)
+        return arr
 
     def clear(self):
         self.initWindow()
