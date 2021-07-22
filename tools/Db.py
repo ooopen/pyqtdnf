@@ -5,8 +5,21 @@ from threading import Thread
 import mysql.connector
 
 
+#单例容器注解
+def singleton(cls):
+    _instance = {}
+
+    def inner():
+        if cls not in _instance:
+            _instance[cls] = cls()
+        return _instance[cls]
+    return inner
+
+@singleton
 class Db():
     connList = []
+
+    db = None
 
     # 每个连接最大使用次数
     useTimes = 10
@@ -15,7 +28,7 @@ class Db():
     # 获取连接超时时间(ms)
     maxGetConnTime = 1000
     # mysql配置
-    cfg = {'user': 'root', 'password': '', 'host': '127.0.0.1', 'database': 'test'}
+    cfg = {'user': 'root', 'password': "root", 'host': 'localhost', 'database': 'dnf'}
 
     #初始化连接池
     def __init__(self):
@@ -47,12 +60,13 @@ class Db():
 
         cursor = conn['cnx'].cursor()
         cursor.execute(query, arg)
-        emp_no = cursor.lastrowid
-        rt = cursor.fetchall()
-        dataList = []
-        for x in rt:
-            dataList.append(dict(zip(cursor.column_names, x)))  # 添加字段名称
-
+        if ("select" in query)  or ("SELECT" in query):
+            rt = cursor.fetchall()
+            ret = []
+            for x in rt:
+                ret.append(dict(zip(cursor.column_names, x)))  # 添加字段名称
+        else:
+            ret = cursor.lastrowid
         # 关闭游标
         conn['cnx'].commit()
         cursor.close()
@@ -71,7 +85,7 @@ class Db():
         self.connList.append(conn)  # 把连接塞回去
 
         # 返回结果
-        return {"data":dataList,'lastrowid':emp_no}
+        return ret
 
 
 # ret = Db()

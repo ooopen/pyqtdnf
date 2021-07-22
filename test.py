@@ -1,11 +1,11 @@
-curritem = {'name': '无色小晶块', 'min': 10, 'buyPrice': 50, 'sellPrice': 52, 'nextRole': None, 'id': 1}
 
-for i in range(10):
-    print(curritem)
-    item = curritem.items()
-    item2 = {}
-    for k,v in item:
-        item2[k] = v
-    item2['sellPrice'] = item2['sellPrice'] + 1
+count = 0
+newPrice = 49
 
-print(item2)
+arr= {1: [48, 947212], 2: [49, 7374733], 3: [50, 5585327], 4: [51, 8226490]}
+
+for k, v in arr.items():
+     if (v[0] <= newPrice):
+         count = count + v[1]
+
+print(count)

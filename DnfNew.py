@@ -13,7 +13,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QSystemTrayIcon, QMenu, QAction
 from system_hotkey import SystemHotkey
 
-from service.DnfModel import DnfModel
+from service.DnfService import DnfService
 from tools.DmTools import mylog, varname
 from ui.main1 import Ui_Form
 
@@ -47,7 +47,7 @@ class MainWindow(QWidget):
         self.ui = Ui_Form()
         self.ui.setupUi(self)
 
-        self.model = DnfModel()
+        self.model = DnfService()
 
         self.ui.pushButton_3.clicked.connect(lambda: self.start("restart"))
         self.ui.pushButton.clicked.connect(lambda: self.start("admin"))

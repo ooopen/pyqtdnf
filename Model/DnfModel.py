@@ -8,12 +8,10 @@ class DnfModel():
     def __init__(self):
         self.db = Db()
 
-    def getConfig(self, idimg='./dnfimg/屠夫.bmp'):
-        query = ("SELECT b.* from dnf_ids a left join dnf_object b on a.gzone_id = b.gzone_id where a.idimg = %s")
-        ret = self.db.execute(query, (idimg,))
-        if (len(ret['data']) > 0):
-            return ret['data'][0]
-        return None
+    def getConfig(self):
+        query = ("SELECT a.id as uid,a.idimg,b.* from dnf_ids a left join dnf_object b on a.gzone_id = b.gzone_id where a.status = 1")
+        ret = self.db.execute(query)
+        return ret
 
     # `ids_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '角色id',
     # `msg` text NOT NULL,
@@ -49,10 +47,10 @@ class DnfModel():
         query = "INSERT into dnf_pricetrend values (null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now())"
         self.db.execute(query, args)
 
-#
+
 # args = (1, 1,1,1,3,4,5,4,5,6)
 #
 #
-# r = DnfModel().addPricetrend(*args)
+# r = DnfModel().getConfig()
 #
 # print(r)

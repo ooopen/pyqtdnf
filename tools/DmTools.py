@@ -8,6 +8,7 @@ import traceback
 from win32com.client import Dispatch
 
 import GlobalVar as gl
+from Model.DnfModel import DnfModel
 
 
 def noRegsvrVip():
@@ -223,12 +224,16 @@ def mylog(dm, msg):
     print(msg)
     file = "runtime" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
     dm.WriteFile("log/" + file, msg + "\r\n")
+    #写日志到数据库
+    md = DnfModel()
+    arg = (0, msg)
+    md.addSyslog(*arg)
 
 
 def mypricelog(dm, id, msg):
     msg = time.strftime("%H:%M:%S", time.localtime()) + "-" + str(msg)
     print(msg)
-    file = str(id)+"-" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
+    file = str(id) + "-" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
     dm.WriteFile("log/" + file, msg + "\r\n")
 
 
