@@ -1,0 +1,400 @@
+00:03:29:begin currentThreadTarget
+00:03:29:currentThreadTarget
+00:03:29:success find：地下城与勇士
+00:03:31:success find：地下城与勇士
+00:03:33:success find：dnfimg/首页弹窗关闭.bmp
+00:03:33:fail to find：dnfimg/关闭.bmp
+00:03:33:success find：dnfimg/关闭拍卖行.bmp
+00:03:34:success find：dnfimg/个人信息.bmp
+00:03:35:success find：dnfimg/屠夫.bmp
+00:03:35:{'idimg': 'dnfimg/屠夫.bmp', 'id': 1, 'gzone_id': 1, 'object_name': '无色小晶块', 'sell_price': 50, 'buy_price': 48}
+00:03:35:current id is dnfimg/屠夫.bmp
+00:03:36:fail to find：dnfimg/个人信息.bmp
+00:03:40:success find：dnfimg/搜索.bmp
+00:04:55:begin currentThreadTarget
+00:04:55:currentThreadTarget
+00:04:55:success find：地下城与勇士
+00:04:57:success find：地下城与勇士
+00:04:58:fail to find：dnfimg/首页弹窗关闭.bmp
+00:04:59:fail to find：dnfimg/关闭.bmp
+00:04:59:fail to find：dnfimg/关闭拍卖行.bmp
+00:04:59:success find：dnfimg/个人信息.bmp
+00:05:00:success find：dnfimg/屠夫.bmp
+00:05:00:{'idimg': 'dnfimg/屠夫.bmp', 'id': 1, 'gzone_id': 1, 'object_name': '无色小晶块', 'sell_price': 50, 'buy_price': 48}
+00:05:00:current id is dnfimg/屠夫.bmp
+00:05:02:fail to find：dnfimg/个人信息.bmp
+00:05:06:success find：dnfimg/搜索.bmp
+00:14:31:begin currentThreadTarget
+00:15:13:begin currentThreadTarget
+00:15:13:currentThreadTarget
+00:15:14:success find：地下城与勇士
+00:15:15:success find：地下城与勇士
+00:15:17:stop
+00:15:17:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:15:17:fail to find：dnfimg/首页弹窗关闭.bmp
+00:15:17:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:15:17:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:15:17:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:15:17:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:15:17:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:15:17:<Thread(currentThreadTarget, started 19476)>
+00:15:17:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:15:17:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:23:03:begin currentThreadTarget
+00:28:36:begin currentThreadTarget
+00:28:36:currentThreadTarget
+00:29:48:begin currentThreadTarget
+00:29:48:currentThreadTarget
+00:40:07:begin currentThreadTarget
+00:40:07:currentThreadTarget
+00:46:25:begin currentThreadTarget
+00:46:25:currentThreadTarget
+00:47:00:begin currentThreadTarget
+00:47:00:currentThreadTarget
+00:58:38:start
+00:58:38:begin demonThreadTarget
+00:58:38:demonThreadTarget
+00:58:38:begin threadControlThreadTarget
+00:58:38:threadControlThreadTarget
+00:58:38:begin spmPreThreadTarget
+00:58:38:spmPreThreadTarget
+00:58:39:success find：地下城与勇士
+00:58:43:fail to find：dnfimg/首页弹窗关闭.bmp
+00:58:44:success find：dnfimg/关闭.bmp
+00:58:45:fail to find：dnfimg/关闭拍卖行.bmp
+00:58:47:fail to find：dnfimg/邮件.bmp
+00:58:48:success find：dnfimg/个人信息.bmp
+00:58:52:success find：dnfimg/屠夫.bmp
+00:58:52:{'idimg': 'dnfimg/屠夫.bmp', 'id': 1, 'gzone_id': 1, 'object_name': '无色小晶块', 'sell_price': 49, 'buy_price': 47}
+00:58:53:current id is dnfimg/屠夫.bmp
+00:58:55:52478581
+00:58:56:金币充足，继续扫拍
+00:59:02:success find：dnfimg/搜索.bmp
+00:59:03:begin doBuyClickThreadTarget
+00:59:03:doBuyClickThreadTarget
+00:59:03:begin spmSearchThreadTarget
+00:59:04:spmSearchThreadTarget
+00:59:39:触发加价判断
+00:59:39:stop
+00:59:39:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:59:39:<Thread(spmPreThreadTarget, stopped 18944)>
+00:59:40:<Thread(spmSearchThreadTarget, started 21884)>
+00:59:40:<Thread(doBuyClickThreadTarget, started 18304)>
+00:59:40:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:59:41:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:59:41:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:59:41:<Thread(spmPreThreadTarget, stopped 18944)>
+00:59:41:<Thread(spmSearchThreadTarget, stopped 21884)>
+00:59:42:<Thread(doBuyClickThreadTarget, stopped 18304)>
+00:59:42:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:59:42:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+00:59:43:success find：地下城与勇士
+00:59:46:fail to find：dnfimg/首页弹窗关闭.bmp
+00:59:47:fail to find：dnfimg/关闭.bmp
+00:59:48:fail to find：dnfimg/关闭拍卖行.bmp
+00:59:49:success find：dnfimg/个人信息.bmp
+00:59:51:success find：dnfimg/屠夫.bmp
+00:59:51:{'idimg': 'dnfimg/屠夫.bmp', 'id': 1, 'gzone_id': 1, 'object_name': '无色小晶块', 'sell_price': 49, 'buy_price': 47}
+00:59:51:current id is dnfimg/屠夫.bmp
+00:59:56:fail to find：dnfimg/个人信息.bmp
+01:00:02:success find：dnfimg/搜索.bmp
+01:00:35:目前售价为：49,当前售卖价不大于50的数量有：1796715,不符合加价条件
+01:00:35:begin spmPreThreadTarget
+01:00:35:spmPreThreadTarget
+01:00:36:success find：地下城与勇士
+01:00:39:fail to find：dnfimg/首页弹窗关闭.bmp
+01:00:41:fail to find：dnfimg/关闭.bmp
+01:00:42:fail to find：dnfimg/关闭拍卖行.bmp
+01:00:44:stop
+01:00:44:fail to find：dnfimg/邮件.bmp
+01:00:45:<Thread(demonThreadTarget, started 20012)>
+01:00:46:<Thread(threadControlThreadTarget, started 16308)>
+01:00:46:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:00:46:<Thread(spmPreThreadTarget, started 20396)>
+01:00:46:<Thread(spmSearchThreadTarget, stopped 21884)>
+01:00:46:<Thread(doBuyClickThreadTarget, stopped 18304)>
+01:00:46:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:00:46:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:00:46:<Thread(demonThreadTarget, stopped 20012)>
+01:00:46:<Thread(threadControlThreadTarget, stopped 16308)>
+01:00:46:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:00:46:<Thread(spmPreThreadTarget, stopped 20396)>
+01:00:46:<Thread(spmSearchThreadTarget, stopped 21884)>
+01:00:46:<Thread(doBuyClickThreadTarget, stopped 18304)>
+01:00:46:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:00:46:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:02:17:start
+01:02:17:begin demonThreadTarget
+01:02:17:demonThreadTarget
+01:02:17:begin threadControlThreadTarget
+01:02:17:threadControlThreadTarget
+01:02:18:begin spmPreThreadTarget
+01:02:18:spmPreThreadTarget
+01:02:19:success find：地下城与勇士
+01:02:22:fail to find：dnfimg/首页弹窗关闭.bmp
+01:02:24:fail to find：dnfimg/关闭.bmp
+01:02:26:fail to find：dnfimg/关闭拍卖行.bmp
+01:02:28:fail to find：dnfimg/邮件.bmp
+01:02:30:success find：dnfimg/个人信息.bmp
+01:02:33:success find：dnfimg/屠夫.bmp
+01:02:34:{'idimg': 'dnfimg/屠夫.bmp', 'id': 1, 'gzone_id': 1, 'object_name': '无色小晶块', 'sell_price': 49, 'buy_price': 47}
+01:02:34:current id is dnfimg/屠夫.bmp
+01:02:36:52478581
+01:02:37:金币充足，继续扫拍
+01:02:44:success find：dnfimg/搜索.bmp
+01:02:46:begin spmSearchThreadTarget
+01:02:46:spmSearchThreadTarget
+01:02:46:begin doBuyClickThreadTarget
+01:02:46:doBuyClickThreadTarget
+01:03:18:触发加价判断
+01:03:18:stop
+01:03:18:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:03:19:<Thread(spmPreThreadTarget, stopped 18080)>
+01:03:19:<Thread(spmSearchThreadTarget, started 22240)>
+01:03:20:<Thread(doBuyClickThreadTarget, started 20736)>
+01:03:21:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:03:21:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:03:22:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:03:23:<Thread(spmPreThreadTarget, stopped 18080)>
+01:03:24:<Thread(spmSearchThreadTarget, stopped 22240)>
+01:03:24:<Thread(doBuyClickThreadTarget, stopped 20736)>
+01:03:25:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:03:25:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:03:26:success find：地下城与勇士
+01:03:28:fail to find：dnfimg/首页弹窗关闭.bmp
+01:03:29:fail to find：dnfimg/关闭.bmp
+01:03:30:fail to find：dnfimg/关闭拍卖行.bmp
+01:03:30:success find：dnfimg/个人信息.bmp
+01:03:33:success find：dnfimg/屠夫.bmp
+01:03:33:{'idimg': 'dnfimg/屠夫.bmp', 'id': 1, 'gzone_id': 1, 'object_name': '无色小晶块', 'sell_price': 49, 'buy_price': 47}
+01:03:33:current id is dnfimg/屠夫.bmp
+01:03:39:fail to find：dnfimg/个人信息.bmp
+01:03:45:success find：dnfimg/搜索.bmp
+01:04:23:目前售价为：49,当前售卖价不大于50的数量有：1658818,不符合加价条件
+01:04:23:begin spmPreThreadTarget
+01:04:23:spmPreThreadTarget
+01:04:24:success find：地下城与勇士
+01:04:26:fail to find：dnfimg/首页弹窗关闭.bmp
+01:04:27:fail to find：dnfimg/关闭.bmp
+01:04:28:stop
+01:04:28:fail to find：dnfimg/关闭拍卖行.bmp
+01:04:28:<Thread(demonThreadTarget, started 12440)>
+01:04:29:<Thread(threadControlThreadTarget, started 21432)>
+01:04:30:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:04:30:<Thread(spmPreThreadTarget, started 5420)>
+01:04:30:<Thread(spmSearchThreadTarget, stopped 22240)>
+01:04:30:<Thread(doBuyClickThreadTarget, stopped 20736)>
+01:04:30:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:04:30:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:04:30:<Thread(demonThreadTarget, stopped 12440)>
+01:04:30:<Thread(threadControlThreadTarget, stopped 21432)>
+01:04:30:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:04:30:<Thread(spmPreThreadTarget, stopped 5420)>
+01:04:30:<Thread(spmSearchThreadTarget, stopped 22240)>
+01:04:30:<Thread(doBuyClickThreadTarget, stopped 20736)>
+01:04:30:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:04:30:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:14:12:start
+01:14:12:begin demonThreadTarget
+01:14:12:demonThreadTarget
+01:14:12:begin threadControlThreadTarget
+01:14:12:threadControlThreadTarget
+01:14:12:begin spmPreThreadTarget
+01:14:12:spmPreThreadTarget
+01:14:13:success find：地下城与勇士
+01:14:16:fail to find：dnfimg/首页弹窗关闭.bmp
+01:14:18:fail to find：dnfimg/关闭.bmp
+01:14:18:fail to find：dnfimg/关闭拍卖行.bmp
+01:14:18:stop
+01:14:19:<Thread(demonThreadTarget, started 21288)>
+01:14:19:<Thread(threadControlThreadTarget, started 9792)>
+01:14:19:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:14:19:<Thread(spmPreThreadTarget, started 7580)>
+01:14:19:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:14:19:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:14:19:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:14:19:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:14:19:<Thread(demonThreadTarget, stopped 21288)>
+01:14:19:<Thread(threadControlThreadTarget, stopped 9792)>
+01:14:19:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:14:19:<Thread(spmPreThreadTarget, stopped 7580)>
+01:14:19:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:14:19:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:14:19:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:14:19:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:14:41:start
+01:14:41:begin demonThreadTarget
+01:14:41:demonThreadTarget
+01:14:41:begin threadControlThreadTarget
+01:14:41:threadControlThreadTarget
+01:14:41:begin spmPreThreadTarget
+01:14:41:spmPreThreadTarget
+01:14:42:success find：地下城与勇士
+01:14:45:fail to find：dnfimg/首页弹窗关闭.bmp
+01:14:47:success find：dnfimg/关闭.bmp
+01:14:48:fail to find：dnfimg/关闭拍卖行.bmp
+01:14:49:success find：dnfimg/邮件.bmp
+01:14:50:success find：dnfimg/邮件.bmp
+01:14:51:success find：dnfimg/选择接收.bmp
+01:14:53:success find：dnfimg/邮件.bmp
+01:14:54:success find：dnfimg/邮件.bmp
+01:14:55:success find：dnfimg/选择接收.bmp
+01:14:57:fail to find：dnfimg/邮件.bmp
+01:14:59:success find：dnfimg/个人信息.bmp
+01:15:02:fail to find：dnfimg/屠夫.bmp
+01:15:04:fail to find：dnfimg/神的.bmp
+01:15:05:success find：dnfimg/百思不得.bmp
+01:15:05:{'uid': 3, 'idimg': 'dnfimg/百思不得.bmp', 'id': 2, 'gzone_id': 2, 'object_name': '无色小晶块', 'sell_price': 55, 'buy_price': 53}
+01:15:06:current id is dnfimg/百思不得.bmp
+01:15:08:65998925
+01:15:08:金币充足，继续扫拍
+01:15:14:success find：dnfimg/搜索.bmp
+01:15:16:begin spmSearchThreadTarget
+01:15:16:spmSearchThreadTarget
+01:15:17:begin doBuyClickThreadTarget
+01:15:17:doBuyClickThreadTarget
+01:15:39:stop
+01:15:40:<Thread(demonThreadTarget, started 16876)>
+01:15:40:<Thread(threadControlThreadTarget, started 17844)>
+01:15:41:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:15:41:<Thread(spmPreThreadTarget, stopped 15940)>
+01:15:41:<Thread(spmSearchThreadTarget, started 11428)>
+01:15:41:<Thread(doBuyClickThreadTarget, started 12664)>
+01:15:41:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:15:41:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:15:41:<Thread(demonThreadTarget, stopped 16876)>
+01:15:41:<Thread(threadControlThreadTarget, stopped 17844)>
+01:15:41:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:15:41:<Thread(spmPreThreadTarget, stopped 15940)>
+01:15:41:<Thread(spmSearchThreadTarget, stopped 11428)>
+01:15:41:<Thread(doBuyClickThreadTarget, stopped 12664)>
+01:15:41:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:15:41:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:14:start
+01:16:14:begin demonThreadTarget
+01:16:14:demonThreadTarget
+01:16:14:begin threadControlThreadTarget
+01:16:14:threadControlThreadTarget
+01:16:14:begin spmPreThreadTarget
+01:16:14:spmPreThreadTarget
+01:16:15:success find：地下城与勇士
+01:16:18:fail to find：dnfimg/首页弹窗关闭.bmp
+01:16:19:success find：dnfimg/关闭.bmp
+01:16:20:fail to find：dnfimg/关闭拍卖行.bmp
+01:16:22:fail to find：dnfimg/邮件.bmp
+01:16:23:success find：dnfimg/个人信息.bmp
+01:16:25:触发加价判断
+01:16:25:stop
+01:16:25:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:25:<Thread(spmPreThreadTarget, started 18568)>
+01:16:26:fail to find：dnfimg/屠夫.bmp
+01:16:26:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:26:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:27:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:27:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:27:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:27:<Thread(spmPreThreadTarget, started 18568)>
+01:16:28:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:28:stop
+01:16:28:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:28:<Thread(demonThreadTarget, started 22432)>
+01:16:28:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:28:<Thread(threadControlThreadTarget, started 21684)>
+01:16:29:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:29:<Thread(spmPreThreadTarget, stopped 18568)>
+01:16:29:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:29:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:29:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:29:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:29:<Thread(demonThreadTarget, stopped 22432)>
+01:16:29:<Thread(threadControlThreadTarget, stopped 21684)>
+01:16:29:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:29:<Thread(spmPreThreadTarget, stopped 18568)>
+01:16:29:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:29:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:29:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:16:29:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:18:33:start
+01:18:33:begin demonThreadTarget
+01:18:33:demonThreadTarget
+01:18:33:begin threadControlThreadTarget
+01:18:33:threadControlThreadTarget
+01:18:33:begin spmPreThreadTarget
+01:18:33:spmPreThreadTarget
+01:18:34:success find：地下城与勇士
+01:18:38:fail to find：dnfimg/首页弹窗关闭.bmp
+01:18:39:fail to find：dnfimg/关闭.bmp
+01:18:40:fail to find：dnfimg/关闭拍卖行.bmp
+01:18:42:fail to find：dnfimg/邮件.bmp
+01:18:43:success find：dnfimg/个人信息.bmp
+01:18:46:fail to find：dnfimg/屠夫.bmp
+01:18:48:fail to find：dnfimg/神的.bmp
+01:18:49:success find：dnfimg/百思不得.bmp
+01:18:50:{'uid': 3, 'idimg': 'dnfimg/百思不得.bmp', 'id': 2, 'gzone_id': 2, 'object_name': '无色小晶块', 'sell_price': 55, 'buy_price': 53}
+01:18:50:current id is dnfimg/百思不得.bmp
+01:18:53:65998925
+01:18:53:金币充足，继续扫拍
+01:18:59:success find：dnfimg/搜索.bmp
+01:19:00:begin spmSearchThreadTarget
+01:19:01:spmSearchThreadTarget
+01:19:01:begin doBuyClickThreadTarget
+01:19:01:doBuyClickThreadTarget
+01:19:34:触发加价判断
+01:19:34:stop
+01:19:34:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:19:35:<Thread(spmPreThreadTarget, stopped 19344)>
+01:19:35:<Thread(spmSearchThreadTarget, started 18328)>
+01:19:35:<Thread(doBuyClickThreadTarget, started 3356)>
+01:19:36:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:19:36:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:19:37:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:19:37:<Thread(spmPreThreadTarget, stopped 19344)>
+01:19:37:<Thread(spmSearchThreadTarget, stopped 18328)>
+01:19:38:<Thread(doBuyClickThreadTarget, stopped 3356)>
+01:19:38:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:19:38:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:19:39:success find：地下城与勇士
+01:19:42:fail to find：dnfimg/首页弹窗关闭.bmp
+01:19:43:fail to find：dnfimg/关闭.bmp
+01:19:44:fail to find：dnfimg/关闭拍卖行.bmp
+01:19:45:success find：dnfimg/个人信息.bmp
+01:19:48:fail to find：dnfimg/屠夫.bmp
+01:19:49:fail to find：dnfimg/神的.bmp
+01:19:49:success find：dnfimg/百思不得.bmp
+01:19:50:{'uid': 3, 'idimg': 'dnfimg/百思不得.bmp', 'id': 2, 'gzone_id': 2, 'object_name': '无色小晶块', 'sell_price': 55, 'buy_price': 53}
+01:19:50:current id is dnfimg/百思不得.bmp
+01:19:55:fail to find：dnfimg/个人信息.bmp
+01:20:01:success find：dnfimg/搜索.bmp
+01:20:21:目前售价为：55,当前售卖价不大于56的数量有：17464972,不符合加价条件
+01:20:22:begin spmPreThreadTarget
+01:20:22:spmPreThreadTarget
+01:20:22:success find：地下城与勇士
+01:20:25:fail to find：dnfimg/首页弹窗关闭.bmp
+01:20:26:fail to find：dnfimg/关闭.bmp
+01:20:28:fail to find：dnfimg/关闭拍卖行.bmp
+01:20:30:fail to find：dnfimg/邮件.bmp
+01:20:32:65998925
+01:20:32:金币充足，继续扫拍
+01:20:37:success find：dnfimg/搜索.bmp
+01:20:39:begin spmSearchThreadTarget
+01:20:39:spmSearchThreadTarget
+01:20:40:begin doBuyClickThreadTarget
+01:20:40:doBuyClickThreadTarget
+01:21:09:01:21:08单价：53;拍卖耗时：0.15372347831726074=>数量：30000.0|成功
+01:21:14:stop
+01:21:14:<Thread(demonThreadTarget, started 17728)>
+01:21:15:<Thread(threadControlThreadTarget, started 20904)>
+01:21:15:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:21:15:<Thread(spmPreThreadTarget, stopped 19560)>
+01:21:15:<Thread(spmSearchThreadTarget, started 10348)>
+01:21:15:<Thread(doBuyClickThreadTarget, started 19748)>
+01:21:15:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:21:15:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:21:15:<Thread(demonThreadTarget, stopped 17728)>
+01:21:15:<Thread(threadControlThreadTarget, stopped 20904)>
+01:21:16:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:21:16:<Thread(spmPreThreadTarget, stopped 19560)>
+01:21:16:<Thread(spmSearchThreadTarget, stopped 10348)>
+01:21:16:<Thread(doBuyClickThreadTarget, started 19748)>
+01:21:16:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
+01:21:16:<module 'null' from 'D:\\python3.8\\lib\\site-packages\\null.py'>
