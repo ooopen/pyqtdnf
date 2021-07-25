@@ -9,7 +9,8 @@ class DnfModel():
         self.db = Db()
 
     def getConfig(self):
-        query = ("SELECT a.id as uid,a.idimg,b.* from dnf_ids a left join dnf_object b on a.gzone_id = b.gzone_id where a.status = 1")
+        query = (
+            "SELECT a.id as uid,a.idimg,b.* from dnf_ids a left join dnf_object b on a.gzone_id = b.gzone_id where a.status = 1")
         ret = self.db.execute(query)
         return ret
 
@@ -47,6 +48,10 @@ class DnfModel():
         query = "INSERT into dnf_pricetrend values (null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now())"
         self.db.execute(query, args)
 
+    def getPricetread(self, *args):
+        query = "SELECT * from dnf_pricetrend where gzone_id=%s and price1>0  order by id desc limit 5"
+        ret = self.db.execute(query, args)
+        return ret
 
 # args = (1, 1,1,1,3,4,5,4,5,6)
 #
