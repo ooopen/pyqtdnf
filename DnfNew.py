@@ -114,6 +114,7 @@ class MainWindow(QWidget):
                "doBuyClickThread"]
 
         while (1):
+            time.sleep(1)
             for item in arr:
                 if (gl.get_value(item) == 1):
                     exec("self." + item + "=self.runThread(self." + item + ", self." + item + "Target)")
@@ -121,6 +122,7 @@ class MainWindow(QWidget):
 
     def demonThreadTarget(self):
         while (1):
+            time.sleep(1)
             if (gl.get_value("doBuyClickThreadError") == 1):  # 扫拍异常修复
                 mylog(self.model.dm, "doBuyClickThreadError")
                 self.stop()

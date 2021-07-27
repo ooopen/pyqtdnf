@@ -17,7 +17,7 @@ import GlobalVar as gl
 class DnfService():
     dm = None
 
-    cPrice = 800 * 10000
+    cPrice = 400 * 10000
     exchangeIdTime = 1800  # s
     currentItem = None
 
@@ -352,6 +352,7 @@ class DnfService():
             t1 = time.time()
             print(t1-t0)
             self.dm.LeftClick()
+            self.dm.LeftClick()
             self.dm.MoveTo(595, 151)
             self.dm.LeftClick()
             self.dm.KeyPress(13)
@@ -360,7 +361,7 @@ class DnfService():
             msg = time.strftime("%H:%M:%S", time.localtime()) + "单价：" + ret + ";拍卖耗时：" + str(t2 - t1)
 
             MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
-            time.sleep(0.1)
+            self.dm.LeftDoubleClick()
             self.dm.LeftDoubleClick()
             time.sleep(0.1)
 
@@ -408,11 +409,16 @@ class DnfService():
         #     gl.set_value("doBuyClickThreadError", 1)
         #     time.sleep(3)
 
-        # tms = round(math.modf(float(time.time()))[0], 1)
-        # if (int(ts) % 10 == 0 and tms < 0.3):
-        #     MoveTo(self.dm, 368, 548)  # 点击购买准备
-        #     self.dm.LeftCLick()
-        #     self.dm.MoveTo(595, 141)  # 移回到价格tip
+        tms = round(math.modf(float(time.time()))[0], 1)
+        if (int(ts) % 10 == 0 and tms < 0.3):
+            MoveTo(self.dm, 368, 548)  # 点击购买准备
+            self.dm.LeftCLick()
+            self.dm.MoveTo(595, 141)  # 移回到价格tip
+            if (self.dm.FindPic( 627, 69, 686, 109, "dnfimg/搜索.bmp", "000000", 0.9, 0)[0] == 0):  # 如果搜索没有置灰，可能搜索失效
+                MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
+                self.dm.LeftDoubleClick()
+                self.dm.MoveTo(595, 141)  # 移回到价格tip
+
 
         # 定时切换不同账号
         te = int(time.time())
