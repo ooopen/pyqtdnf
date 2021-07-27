@@ -136,6 +136,7 @@ class MainWindow(QWidget):
                 self.stop()
                 self.model.getMail()
                 self.model.upSell()
+                self.model.upSell()
                 gl.set_value("exchangeIdThread", 1)
 
             if (gl.get_value("JbChangeRole") == 1):  # 换role

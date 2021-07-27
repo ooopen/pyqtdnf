@@ -17,7 +17,7 @@ import GlobalVar as gl
 class DnfService():
     dm = None
 
-    cPrice = 600 * 10000
+    cPrice = 800 * 10000
     exchangeIdTime = 1800  # s
     currentItem = None
 
@@ -52,6 +52,15 @@ class DnfService():
             time.sleep(1)
 
     def current(self):
+        for i in range(100):
+            t1 = time.time()
+            self.dm.LeftClick()
+            self.dm.MoveTo(595, 151)
+            self.dm.LeftClick()
+            self.dm.KeyPress(13)
+            self.dm.KeyPress(13)
+            print(time.time()-t1)
+        return
         self.clear()
         # 判断当前角色
         self.dm.KeyPress(77)
@@ -83,11 +92,6 @@ class DnfService():
     ###type=[login，exchangeId]
     def loginOrExchangeId(self, type="login"):
         mylog(self.dm, type)
-
-        # 切换前先上架
-        if (type == "exchangeId"):
-            self.upSell()
-            self.upSell()
 
         hwnd = FindWindow(self.dm, "WeGame", 1)
         if (hwnd == 0):
@@ -188,6 +192,8 @@ class DnfService():
         clickPic(self.dm, "dnfimg/wg地下城.bmp", 50, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/协议.bmp", 50, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/启动.bmp", 50, 1, 0, 0, 1300, 1200)
+        MoveTo(self.dm,1215,17)
+        LeftClick(self.dm)
         time.sleep(20)
         self.initWindow("地下城与勇士", 30)
         time.sleep(10)
@@ -322,6 +328,7 @@ class DnfService():
         time.sleep(0.1)
 
     def doBuyClick(self):
+
         item2 = self.currentItem
         if (item2 == None):
             myexit(self.dm, "currentItem为None")
@@ -336,11 +343,14 @@ class DnfService():
         if (gl.get_cache("changePrice") == True):
             item['buy_price'] = item['buy_price'] + 1
 
-        t1 = time.time()
+        t0 = time.time()
         ret = ocrDj(self.dm)
+
         # 如果检测到物品价格低于预设，
         if (ret != -1 and int(ret) <= item['buy_price']):
             # mylog(self.dm,"识别耗时："+str(time.time()-t1))
+            t1 = time.time()
+            print(t1-t0)
             self.dm.LeftClick()
             self.dm.MoveTo(595, 151)
             self.dm.LeftClick()
@@ -383,6 +393,7 @@ class DnfService():
             if (retleft != -1 and int(retleft) < 5000000):
                 mylog(self.dm, "金币不足")
                 gl.set_value("doBuyClickThreadError", 1)  # 金币不足触发上架判断
+            print(time.time()-t2)
 
         if (ret == -1):
             mylog(self.dm, "识别单价失败")
@@ -392,10 +403,10 @@ class DnfService():
         # 定时重启拍卖行，防止鼠标点击问题
         tm = time.strftime("%M", time.localtime())
         ts = time.strftime("%S", time.localtime())
-        if (int(tm) % 11 == 0 and int(ts) < 3):
-            mylog(self.dm, "定时重启拍卖行，防止鼠标点击问题")
-            gl.set_value("doBuyClickThreadError", 1)
-            time.sleep(3)
+        # if (int(tm) % 11 == 0 and int(ts) < 3):
+        #     mylog(self.dm, "定时重启拍卖行，防止鼠标点击问题")
+        #     gl.set_value("doBuyClickThreadError", 1)
+        #     time.sleep(3)
 
         # tms = round(math.modf(float(time.time()))[0], 1)
         # if (int(ts) % 10 == 0 and tms < 0.3):
@@ -414,16 +425,18 @@ class DnfService():
 
     def getMail(self):
         self.clear()
-        for i in range(20):
+        for i in range(6):
             if (findPic(self.dm, "dnfimg/邮件.bmp", 1, 0, 685, 463, 801, 541)[0] == 0):  # 如果有邮件
-                clickPic(self.dm, "dnfimg/邮件.bmp", 5, 0, 685, 463, 801, 541)
-                time.sleep(0.5)
+                MoveTo(self.dm,743,495)
+                LeftClick(self.dm)
+                time.sleep(0.3)
                 MoveTo(self.dm,305,469)
                 LeftClick(self.dm)
-                time.sleep(0.5)
+                time.sleep(0.2)
                 self.dm.KeyPress(27)  # 重置一下
             else:
                 break
+
 
     def changePrice(self):
         arr = self.coutSell()
@@ -663,7 +676,7 @@ class DnfService():
         self.initWindow()
         self.dm.KeyPress(27)  # 重置一下
         time.sleep(0.1)
-        clickPic(self.dm, "dnfimg/首页弹窗关闭.bmp", 1, 0, 343, 432, 457, 480)
+        clickPic(self.dm, "dnfimg/首页弹窗关闭.bmp", 5, 0, 343, 432, 457, 480)
         MoveTo(self.dm, 511, 150)
         LeftClick(self.dm)
         clickPic(self.dm, "dnfimg/关闭.bmp", 5, 0, 578, 103, 638, 144)
