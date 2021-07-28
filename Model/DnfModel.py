@@ -10,7 +10,7 @@ class DnfModel():
 
     def getConfig(self):
         query = (
-            "SELECT a.id as uid,a.idimg,b.* from dnf_ids a left join dnf_object b on a.gzone_id = b.gzone_id where a.status = 1")
+            "SELECT a.id as uid,a.idimg,b.*, c.c_price from dnf_ids a left join dnf_object b on a.gzone_id = b.gzone_id left join dnf_gzone c on c. id = a.gzone_id where a.status = 1")
         ret = self.db.execute(query)
         return ret
 
@@ -19,6 +19,14 @@ class DnfModel():
     # `create_time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
     def addSyslog(self, *args):
         query = "INSERT into dnf_syslog  values (null,%s,%s,now())"
+        self.db.execute(query, args)
+
+    # `ids_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '角色id',
+    # `type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '操作类型：1，登录，2登出',
+    # `jb` int(10) NOT NULL DEFAULT '0' COMMENT '剩余金币数量',
+    # `create_time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+    def addIdslog(self, *args):
+        query = "INSERT into dnf_ids_log  values (null,%s,%s,%s,now())"
         self.db.execute(query, args)
 
     # `ids_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '角色id',

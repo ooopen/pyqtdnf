@@ -59,7 +59,7 @@ class DnfService():
             self.dm.LeftClick()
             self.dm.KeyPress(13)
             self.dm.KeyPress(13)
-            print(time.time()-t1)
+            print(time.time() - t1)
         return
         self.clear()
         # 判断当前角色
@@ -86,7 +86,7 @@ class DnfService():
         time.sleep(0.5)
 
         # 计算购买的值
-        #self.calBuyPrice()
+        # self.calBuyPrice()
         self.coutSell()
 
     ###type=[login，exchangeId]
@@ -113,6 +113,13 @@ class DnfService():
             self.initWindow("WeGame", 10, 1)
 
         else:
+
+            # 记录角色信息日志
+            ret = gl.get_cache("logoutjbleft")
+            args = (
+                self.currentItem['uid'], 2, int(ret))
+            self.db.addIdslog(*args)
+
             # 关闭游戏
             self.initWindow("WeGame", 10, 1)
             time.sleep(1)
@@ -192,7 +199,7 @@ class DnfService():
         clickPic(self.dm, "dnfimg/wg地下城.bmp", 20, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/协议.bmp", 20, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/启动.bmp", 20, 1, 0, 0, 1300, 1200)
-        MoveTo(self.dm,1215,17)
+        MoveTo(self.dm, 1215, 17)
         LeftClick(self.dm)
         time.sleep(20)
         self.initWindow("地下城与勇士", 30)
@@ -280,6 +287,7 @@ class DnfService():
         # 判断金币是否充足，否则换角色
         ret = ocrJb(self.dm)  # 检查金币数量，金币不足上架
         mylog(self.dm, ret)
+
         gl.set_value("jbleft", ret)  # 为第一次购买成功计算依据
 
         if (ret != -1 and int(ret) > 5000000):
@@ -293,8 +301,10 @@ class DnfService():
             # 由于金币不足导致的切换，重置切换时间
             gl.set_cache("exchangeIdTime", 0)
             gl.set_value("JbChangeId", 1)
-            return
 
+            # 登出前的金币数量
+            gl.set_cache("logoutjbleft", int(ret))
+            return
 
         MoveTo(self.dm, 43, 67)  # 点击物品搜索tab
         LeftClick(self.dm)
@@ -349,7 +359,7 @@ class DnfService():
         if (ret != -1 and int(ret) <= item['buy_price']):
             # mylog(self.dm,"识别耗时："+str(time.time()-t1))
             t1 = time.time()
-            print(t1-t0)
+            print(t1 - t0)
             self.dm.LeftClick()
             self.dm.MoveTo(595, 151)
             self.dm.LeftClick()
@@ -412,11 +422,10 @@ class DnfService():
             MoveTo(self.dm, 368, 548)  # 点击购买准备
             self.dm.LeftCLick()
             self.dm.MoveTo(595, 141)  # 移回到价格tip
-            if (self.dm.FindPic( 627, 69, 686, 109, "dnfimg/搜索.bmp", "000000", 0.9, 0)[0] == 0):  # 如果搜索没有置灰，可能搜索失效
+            if (self.dm.FindPic(627, 69, 686, 109, "dnfimg/搜索.bmp", "000000", 0.9, 0)[0] == 0):  # 如果搜索没有置灰，可能搜索失效
                 MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
                 self.dm.LeftDoubleClick()
                 self.dm.MoveTo(595, 141)  # 移回到价格tip
-
 
         # 定时切换不同账号
         te = int(time.time())
@@ -431,16 +440,15 @@ class DnfService():
         self.clear()
         for i in range(6):
             if (findPic(self.dm, "dnfimg/邮件.bmp", 1, 0, 685, 463, 801, 541)[0] == 0):  # 如果有邮件
-                MoveTo(self.dm,743,495)
+                MoveTo(self.dm, 743, 495)
                 LeftClick(self.dm)
                 time.sleep(0.3)
-                MoveTo(self.dm,305,469)
+                MoveTo(self.dm, 305, 469)
                 LeftClick(self.dm)
                 time.sleep(0.2)
                 self.dm.KeyPress(27)  # 重置一下
             else:
                 break
-
 
     def changePrice(self):
         arr = self.coutSell()
@@ -452,7 +460,7 @@ class DnfService():
                 count = count + v[1]
         if (count == 0):
             return
-        if (count < self.cPrice):
+        if (count < self.currentItem['c_price']):
             mylog(self.dm, "目前售价为：" + str(self.currentItem['sell_price']) + ",当前售卖价不大于" + str(newPrice) + "的数量有：" + str(
                 count) + ",价格+1")
             gl.set_cache("changePrice", True)
@@ -563,9 +571,17 @@ class DnfService():
         if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == 0):
             self.dm.KeyPress(77)
         time.sleep(1)
-        # 定位到搜索栏
+
         self.dm.KeyPress(76)
         time.sleep(1)
+
+        # 记录角色信息日志
+        ret = ocrJb(self.dm)
+        args = (
+            self.currentItem['uid'], 1, int(ret))
+        self.db.addIdslog(*args)
+
+        # 定位到搜索栏
         MoveTo(self.dm, 43, 67)  # 点击物品搜索tab
         LeftClick(self.dm)
         MoveTo(self.dm, 43, 116)  # 点击全部
@@ -636,20 +652,20 @@ class DnfService():
         for item in data:
             co = cp = 0
             co = co + item['count1']
-            if (co < self.cPrice):
+            if (co < self.currentItem['c_price']):
                 cp = item['price1']
                 co = co + item['count2']
-                if (co < self.cPrice):
+                if (co < self.currentItem['c_price']):
                     cp = item['price2']
                     co = co + item['count3']
-                    if (co < self.cPrice):
+                    if (co < self.currentItem['c_price']):
                         cp = item['price3']
                         co = co + item['count4']
-                        if (co < self.cPrice):
+                        if (co < self.currentItem['c_price']):
                             cp = item['price4']
-            if(cp == 0): #count1就比cPrice大了，这时候，应该取cPrice-1
-                cp = item['price1']-1
-            if(qz == 5):
+            if (cp == 0):  # count1就比cPrice大了，这时候，应该取cPrice-1
+                cp = item['price1'] - 1
+            if (qz == 5):
                 cp = cp * qz * 4
             else:
                 cp = cp * qz
@@ -658,7 +674,7 @@ class DnfService():
         sum = 0
         for i in li:
             sum = sum + i
-        sellPrice = sum / ((5*4 + 4 + 3 + 2 + 1))
+        sellPrice = sum / ((5 * 4 + 4 + 3 + 2 + 1))
         xs = round(math.modf(sellPrice)[0], 1)
         if (xs > 0.7):
             sellPrice = int(sellPrice) + 1
@@ -667,8 +683,8 @@ class DnfService():
         mylog(self.dm, "目前存量：" + str(data[0]))
         mylog(self.dm, "大数据智能计算销售价：" + str(sellPrice))
 
-        if(sellPrice > self.currentItem['sell_price']):
-            mylog(self.dm, "智能计算的结果为：" + str(sellPrice)+" 大于阈值:"+str(self.currentItem['sell_price']))
+        if (sellPrice > self.currentItem['sell_price']):
+            mylog(self.dm, "智能计算的结果为：" + str(sellPrice) + " 大于阈值:" + str(self.currentItem['sell_price']))
             return
 
         self.currentItem['buy_price'] = sellPrice - 2
