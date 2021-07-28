@@ -36,7 +36,7 @@ class MainWindow(QWidget):
 
     currentThread = null
 
-    checkTime = 60 * 60  # 自检时间间隔
+    checkTime = 30 * 60  # 自检时间间隔
     checkPriceTime = 5 * 60  # 长时间没有试图购买，触发加价逻辑判断
 
     # 界面配置信息，先写死
@@ -123,6 +123,19 @@ class MainWindow(QWidget):
     def demonThreadTarget(self):
         while (1):
             time.sleep(1)
+
+            # 终极大招，以试图抢购为依据，判断物价过高，或者金币不足，或者脚本异常,发邮件告警。
+            stime = gl.get_cache("lastTryDoBuyClickTime")
+            etime = int(time.time())
+            if (stime != 0 and etime - stime > self.checkTime and etime - stime < self.checkTime + 5):
+                self.stop()
+                mylog(self.model.dm, "抢购异常")
+                self.model.warnning()
+                self.stop()
+                gl.set_value("loginThread", 1)
+                time.sleep(5)
+
+
             if (gl.get_value("doBuyClickThreadError") == 1):  # 扫拍异常修复
                 mylog(self.model.dm, "doBuyClickThreadError")
                 self.stop()
@@ -163,15 +176,7 @@ class MainWindow(QWidget):
             #     gl.set_value("spmPreThread", 1)
             #     time.sleep(3)
 
-            # 终极大招，以试图抢购为依据，判断物价过高，或者金币不足，或者脚本异常,发邮件告警。
-            stime = gl.get_cache("lastTryDoBuyClickTime")
-            etime = int(time.time())
-            if (stime != 0 and etime - stime > self.checkTime and etime - stime < self.checkTime + 2):
-                mylog(self.model.dm, "抢购异常")
-                self.model.warnning()
-                self.stop()
-                gl.set_value("loginThread", 1)
-                time.sleep(3)
+
 
     def stop(self, items=null):  # 停止子线程
         mylog(self.model.dm, "stop")

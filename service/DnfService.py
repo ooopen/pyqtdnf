@@ -17,8 +17,8 @@ import GlobalVar as gl
 class DnfService():
     dm = None
 
-    cPrice = 400 * 10000
-    exchangeIdTime = 1800  # s
+    cPrice = 600 * 10000
+    exchangeIdTime = 1200  # s
     currentItem = None
 
     product1 = {"name": "无色小晶块", "min": 10, "buyPrice": 50, "sellPrice": 52}
@@ -116,11 +116,11 @@ class DnfService():
             # 关闭游戏
             self.initWindow("WeGame", 10, 1)
             time.sleep(1)
-            clickPic(self.dm, "dnfimg/wg首页.bmp", 100, 0, 0, 0, 1300, 1200)
-            clickPic(self.dm, "dnfimg/wg地下城.bmp", 50, 0, 0, 0, 1300, 1200)
-            clickPic(self.dm, "dnfimg/关闭应用1.bmp", 50, 1, 1198, 747, 1286, 839)
-            clickPic(self.dm, "dnfimg/关闭应用2.bmp", 50, 1, 1001, 693, 1139, 752)
-            clickPic(self.dm, "dnfimg/关闭应用3.bmp", 50, 1, 673, 485, 1187, 788)
+            clickPic(self.dm, "dnfimg/wg首页.bmp", 50, 0, 0, 0, 1300, 1200)
+            clickPic(self.dm, "dnfimg/wg地下城.bmp", 20, 0, 0, 0, 1300, 1200)
+            clickPic(self.dm, "dnfimg/关闭应用1.bmp", 20, 1, 1198, 747, 1286, 839)
+            clickPic(self.dm, "dnfimg/关闭应用2.bmp", 20, 1, 1001, 693, 1139, 752)
+            clickPic(self.dm, "dnfimg/关闭应用3.bmp", 20, 1, 673, 485, 1187, 788)
 
             # 点击切换账号
             self.initWindow("WeGame", 10, 1)
@@ -151,7 +151,7 @@ class DnfService():
             MoveTo(self.dm, 755, 308)  # TODO 后续这里考虑做成动态的
             time.sleep(0.1)
             self.dm.WheelDown()  # 滚动到最后一个
-            time.sleep(1)
+            time.sleep(0.3)
             LeftClick(self.dm)
             time.sleep(0.1)
         MoveTo(self.dm, 744, 327)
@@ -180,18 +180,18 @@ class DnfService():
                 time.sleep(1)
                 if (i == 7):
                     myexit(self.dm, "verification code is not auth")
+            time.sleep(2)
 
-        time.sleep(3)
         self.startGame()
 
     def startGame(self):
         # 启动游戏
         self.initWindow("WeGame", 4, 1)
         time.sleep(1)
-        clickPic(self.dm, "dnfimg/wg首页.bmp", 100, 0, 0, 0, 1300, 1200)
-        clickPic(self.dm, "dnfimg/wg地下城.bmp", 50, 0, 0, 0, 1300, 1200)
-        clickPic(self.dm, "dnfimg/协议.bmp", 50, 0, 0, 0, 1300, 1200)
-        clickPic(self.dm, "dnfimg/启动.bmp", 50, 1, 0, 0, 1300, 1200)
+        clickPic(self.dm, "dnfimg/wg首页.bmp", 50, 0, 0, 0, 1300, 1200)
+        clickPic(self.dm, "dnfimg/wg地下城.bmp", 20, 0, 0, 0, 1300, 1200)
+        clickPic(self.dm, "dnfimg/协议.bmp", 20, 0, 0, 0, 1300, 1200)
+        clickPic(self.dm, "dnfimg/启动.bmp", 20, 1, 0, 0, 1300, 1200)
         MoveTo(self.dm,1215,17)
         LeftClick(self.dm)
         time.sleep(20)
@@ -215,7 +215,7 @@ class DnfService():
 
         gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
 
-        time.sleep(15)
+        time.sleep(10)
         # 准备扫拍
         gl.set_value("spmPreThread", 1)
 
@@ -271,12 +271,11 @@ class DnfService():
     def fastSpmPre(self):
         self.getMail()
         self.clear()
-        time.sleep(1)
         self.dm.KeyPress(76)
-        time.sleep(1)
+        time.sleep(0.5)
         if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
             self.dm.KeyPress(76)
-            time.sleep(1)
+            time.sleep(0.5)
 
         # 判断金币是否充足，否则换角色
         ret = ocrJb(self.dm)  # 检查金币数量，金币不足上架
@@ -352,7 +351,6 @@ class DnfService():
             t1 = time.time()
             print(t1-t0)
             self.dm.LeftClick()
-            self.dm.LeftClick()
             self.dm.MoveTo(595, 151)
             self.dm.LeftClick()
             self.dm.KeyPress(13)
@@ -377,12 +375,13 @@ class DnfService():
                 is_succ = 0
                 num = 0
             else:
-                gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 终极大招和涨价的判断依据
                 gl.set_value("jbleft", retleft)
                 status = "成功"
                 is_succ = 1
                 num = (int(jbleft) - int(retleft)) / int(ret)
             mylog(self.dm, msg + "=>" + "数量：" + str(num) + "|" + status)
+
+            gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 终极大招和涨价的判断依据
 
             # 写数据库
             buy_scost = int(jbleft) - int(retleft)
@@ -394,7 +393,6 @@ class DnfService():
             if (retleft != -1 and int(retleft) < 5000000):
                 mylog(self.dm, "金币不足")
                 gl.set_value("doBuyClickThreadError", 1)  # 金币不足触发上架判断
-            print(time.time()-t2)
 
         if (ret == -1):
             mylog(self.dm, "识别单价失败")
@@ -545,7 +543,6 @@ class DnfService():
         color2 = self.dm.GetColor(9, 583)
         if (color2 == color1):
             mylog(self.dm, "终极大招检查失败")
-            gl.set_value("networkError", 1)
 
     def coutSell(self):
         self.clear()
