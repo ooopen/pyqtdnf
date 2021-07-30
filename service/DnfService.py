@@ -52,15 +52,6 @@ class DnfService():
             time.sleep(1)
 
     def current(self):
-        for i in range(100):
-            t1 = time.time()
-            self.dm.LeftClick()
-            self.dm.MoveTo(595, 151)
-            self.dm.LeftClick()
-            self.dm.KeyPress(13)
-            self.dm.KeyPress(13)
-            print(time.time() - t1)
-        return
         self.clear()
         # 判断当前角色
         self.dm.KeyPress(77)
@@ -222,7 +213,7 @@ class DnfService():
 
         gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
 
-        time.sleep(10)
+        time.sleep(15)
         # 准备扫拍
         gl.set_value("spmPreThread", 1)
 
@@ -268,8 +259,17 @@ class DnfService():
         if (self.currentItem == None):
             myexit(self.dm, "currentItem为None")
 
-        self.dm.KeyPress(77)  # 关闭角色信息
+        # 记录角色信息日志
+        self.clear()
+        self.dm.KeyPress(76)
         time.sleep(0.5)
+        if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
+            self.dm.KeyPress(76)
+            time.sleep(0.5)
+        ret = ocrJb(self.dm)
+        args = (
+            self.currentItem['uid'], 1, int(ret))
+        self.db.addIdslog(*args)
 
         # 计算购买的值
         self.calBuyPrice()
@@ -334,7 +334,7 @@ class DnfService():
     # 不断输入enter键，持续刷新拍卖行数据
     def spmSearch(self, ):
         self.dm.KeyPress(13)
-        time.sleep(0.1)
+        time.sleep(0.03)
 
     def doBuyClick(self):
 
@@ -412,11 +412,6 @@ class DnfService():
         # 定时重启拍卖行，防止鼠标点击问题
         tm = time.strftime("%M", time.localtime())
         ts = time.strftime("%S", time.localtime())
-        # if (int(tm) % 11 == 0 and int(ts) < 3):
-        #     mylog(self.dm, "定时重启拍卖行，防止鼠标点击问题")
-        #     gl.set_value("doBuyClickThreadError", 1)
-        #     time.sleep(3)
-
         tms = round(math.modf(float(time.time()))[0], 1)
         if (int(ts) % 10 == 0 and tms < 0.3):
             MoveTo(self.dm, 368, 548)  # 点击购买准备
@@ -438,8 +433,8 @@ class DnfService():
 
     def getMail(self):
         self.clear()
-        for i in range(6):
-            if (findPic(self.dm, "dnfimg/邮件.bmp", 1, 0, 685, 463, 801, 541)[0] == 0):  # 如果有邮件
+        for i in range(20):
+            if (findPic(self.dm, "dnfimg/邮件.bmp|dnfimg/邮件1.bmp", 1, 0, 685, 463, 801, 541)[0] != -1):  # 如果有邮件
                 MoveTo(self.dm, 743, 495)
                 LeftClick(self.dm)
                 time.sleep(0.3)
@@ -575,12 +570,6 @@ class DnfService():
         self.dm.KeyPress(76)
         time.sleep(1)
 
-        # 记录角色信息日志
-        ret = ocrJb(self.dm)
-        args = (
-            self.currentItem['uid'], 1, int(ret))
-        self.db.addIdslog(*args)
-
         # 定位到搜索栏
         MoveTo(self.dm, 43, 67)  # 点击物品搜索tab
         LeftClick(self.dm)
@@ -666,7 +655,7 @@ class DnfService():
             if (cp == 0):  # count1就比cPrice大了，这时候，应该取cPrice-1
                 cp = item['price1'] - 1
             if (qz == 5):
-                cp = cp * qz * 4
+                cp = cp * qz * 10
             else:
                 cp = cp * qz
             li.append(cp)
@@ -674,7 +663,7 @@ class DnfService():
         sum = 0
         for i in li:
             sum = sum + i
-        sellPrice = sum / ((5 * 4 + 4 + 3 + 2 + 1))
+        sellPrice = sum / ((5 * 10 + 4 + 3 + 2 + 1))
         xs = round(math.modf(sellPrice)[0], 1)
         if (xs > 0.7):
             sellPrice = int(sellPrice) + 1
@@ -695,7 +684,7 @@ class DnfService():
         self.initWindow()
         self.dm.KeyPress(27)  # 重置一下
         time.sleep(0.1)
-        clickPic(self.dm, "dnfimg/首页弹窗关闭.bmp", 5, 0, 343, 432, 457, 480)
+        clickPic(self.dm, "dnfimg/首页弹窗关闭.bmp|dnfimg/关闭首页.bmp", 5, 0, 0, 0, 857, 880)
         MoveTo(self.dm, 511, 150)
         LeftClick(self.dm)
         clickPic(self.dm, "dnfimg/关闭.bmp", 5, 0, 578, 103, 638, 144)

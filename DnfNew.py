@@ -134,14 +134,24 @@ class MainWindow(QWidget):
                 self.stop()
                 gl.set_value("loginThread", 1)
                 time.sleep(5)
-
+            #5分钟没有试图抢拍，说明效率不高，切换账号
+            stime = gl.get_cache("lastTryDoBuyClickTime")
+            etime = int(time.time())
+            if (stime != 0 and etime - stime > 300 and etime - stime < 305):
+                self.stop()
+                mylog(self.model.dm, "5分钟没有试图扫拍，切换账号")
+                self.stop()
+                self.model.getMail()
+                self.model.upSell()
+                gl.set_value("exchangeIdThread", 1)
+                time.sleep(5)
 
             if (gl.get_value("doBuyClickThreadError") == 1):  # 扫拍异常修复
                 mylog(self.model.dm, "doBuyClickThreadError")
                 self.stop()
                 tm = time.strftime("%M", time.localtime())
                 th = time.strftime("%H", time.localtime())
-                if(th == 0 and tm < 10): #凌晨0点才用
+                if(int(th) == 0 and int(tm) < 10): #凌晨0点才用
                     gl.set_value("spmPreThread", 1)
                 else:
                     self.model.fastSpmPre()
