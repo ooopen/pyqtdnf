@@ -211,6 +211,9 @@ class DnfService():
         # 还原加价标识，防止影响到其他角色或场景
         gl.set_cache("changePrice", False)
 
+        #还原定时切换账号
+        gl.set_cache("exchangeIdTime",time.time())
+
         gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
 
         time.sleep(15)
@@ -434,8 +437,9 @@ class DnfService():
     def getMail(self):
         self.clear()
         for i in range(20):
-            if (findPic(self.dm, "dnfimg/邮件.bmp|dnfimg/邮件1.bmp", 1, 0, 685, 463, 801, 541)[0] != -1):  # 如果有邮件
-                MoveTo(self.dm, 743, 495)
+            ret = findPic(self.dm, "dnfimg/邮件.bmp|dnfimg/邮件1.bmp", 1, 0, 685, 463, 801, 541)
+            if (ret[0] >= 0):  # 如果有邮件
+                MoveTo(self.dm, ret[1], ret[2])
                 LeftClick(self.dm)
                 time.sleep(0.3)
                 MoveTo(self.dm, 305, 469)
@@ -482,6 +486,7 @@ class DnfService():
             time.sleep(1)
 
         clickPic(self.dm, "dnfimg/上架拍卖品.bmp", 100, 0, 0, 508, 117, 591)
+        clickPic(self.dm, "dnfimg/上架拍卖品.bmp", 1, 0, 0, 508, 117, 591)
         time.sleep(1)
 
         ret = findPic(self.dm, "dnfimg/装备栏.bmp", 10, 0, 401, 0, 710, 170)
@@ -495,31 +500,37 @@ class DnfService():
             LeftClick(self.dm)
             LeftClick(self.dm)
             time.sleep(0.1)
-
+        time.sleep(1)
         ret = findPic(self.dm, "dnfimg/无色.bmp", 10, 0, 698, 312, 803, 470)
         if (ret[0] == 0):  #
-            MoveTo(self.dm, ret[1], ret[2])
-            LeftDown(self.dm)
-            MoveTo(self.dm, 237, 293)
-            LeftUp(self.dm)
-            LeftClick(self.dm)  # 点确定
-            LeftClick(self.dm)  # 点确定
-            MoveTo(self.dm, 397, 471)
 
-            if (findPic(self.dm, "dnfimg/无色.bmp", 10, 0, 203, 263, 257, 306)[0] == 0):  # 如果无色移动过去成功
-                LeftClick(self.dm)
-                for i in range(10):
-                    self.dm.KeyPress(8)
-                    time.sleep(0.01)
-                SendString(self.dm, item['sell_price'])
+            # 数量大于50万才上架
+            num = ocrWsnum(self.dm)
+            print(num)
+            if (num != -1 and int(num) > 500000):
 
-                ret = ocrsellDj(self.dm)
-                if (ret != -1 and int(ret) == item['sell_price']):
-                    MoveTo(self.dm, 372, 508)
+                MoveTo(self.dm, ret[1], ret[2])
+                LeftDown(self.dm)
+                MoveTo(self.dm, 237, 293)
+                LeftUp(self.dm)
+                LeftClick(self.dm)  # 点确定
+                LeftClick(self.dm)  # 点确定
+                MoveTo(self.dm, 397, 471)
+
+                if (findPic(self.dm, "dnfimg/无色.bmp", 10, 0, 203, 263, 257, 306)[0] == 0):  # 如果无色移动过去成功
                     LeftClick(self.dm)
-                    MoveTo(self.dm, 372, 508)
-                    LeftClick(self.dm)  # 48小时
-                    clickPic(self.dm, "dnfimg/开始排名.bmp", 100, 0, 249, 560, 339, 596)
+                    for i in range(10):
+                        self.dm.KeyPress(8)
+                        time.sleep(0.01)
+                    SendString(self.dm, item['sell_price'])
+
+                    ret = ocrsellDj(self.dm)
+                    if (ret != -1 and int(ret) == item['sell_price']):
+                        MoveTo(self.dm, 372, 508)
+                        LeftClick(self.dm)
+                        MoveTo(self.dm, 372, 508)
+                        LeftClick(self.dm)  # 48小时
+                        clickPic(self.dm, "dnfimg/开始排名.bmp", 100, 0, 249, 560, 339, 596)
 
         time.sleep(0.1)
         self.dm.KeyPress(27)  # 重置一下
@@ -593,11 +604,16 @@ class DnfService():
         curprice = 0
         arr = {1: [0, 0], 2: [0, 0], 3: [0, 0], 4: [0, 0]}
         ins = 0
-        for i in range(40):
+        sh = 48
+        for i in range(60):
             y1 = 129
             y2 = 141
             yy1 = 125
             yy2 = 140
+
+            yyy1 = 134
+            yyy2 = 153
+
             for i in range(10):
                 ret1 = self.dm.Ocr(550, y1, 624, y2, "ffb500-000000|ff3131-000000", 0.9)  # 总价
                 y1 = y1 + 37.33333
@@ -605,6 +621,12 @@ class DnfService():
                 ret2 = self.dm.Ocr(142, yy1, 173, yy2, "ffffff-000000|ffce31-000000", 0.9)  # 数量
                 yy1 = yy1 + 37.33333
                 yy2 = yy2 + 37.33333
+
+                # 最后拍卖剩余时间
+                ret3 = self.dm.Ocr(425, yyy1, 444, yyy2, "e1c593-000000", 0.9)
+                yyy1 = yyy1 + 37.33333
+                yyy2 = yyy2 + 37.33333
+
                 if (ret1 == "" or ret2 == ""):
                     break
                 price = int(int(ret1) / int(ret2))
@@ -613,10 +635,16 @@ class DnfService():
 
                 if (price > curprice):
                     if (count > 0):
-                        arr[ins] = [curprice, count]
+                        arr[ins] = [curprice, count, sh]
+
                     ins = ins + 1
                     count = 0
                     curprice = price
+                    sh = 48
+
+                if (int(ret3) < sh):
+                    sh = int(ret3)  # 防止48小时造成的误差，取最小为准
+
                 count = count + int(ret2)
 
             if (ret1 == "" or ret2 == "" or ins > 4):
@@ -627,8 +655,9 @@ class DnfService():
         mypricelog(self.dm, self.currentItem['id'], arr)
         # 入库
         args = (
-            self.currentItem['id'], self.currentItem['gzone_id'], arr[1][0], arr[1][1], arr[2][0], arr[2][1], arr[3][0],
-            arr[3][1], arr[4][0], arr[4][1])
+            self.currentItem['id'], self.currentItem['gzone_id'], arr[1][0], arr[1][1], arr[1][2], arr[2][0], arr[2][1],
+            arr[2][2], arr[3][0],
+            arr[3][1], arr[3][2], arr[4][0], arr[4][1], arr[4][2])
         self.db.addPricetrend(*args)
         return arr
 
@@ -637,38 +666,52 @@ class DnfService():
         args = (self.currentItem['gzone_id'],)
         data = self.db.getPricetread(*args)
         li = []
-        qz = 5
+        sellh = 0
+        sum = 0
         for item in data:
             co = cp = 0
-            co = co + item['count1']
+            co = co + item['count1']  # 总数
             if (co < self.currentItem['c_price']):
                 cp = item['price1']
+                sellh = item['sellh1']
                 co = co + item['count2']
                 if (co < self.currentItem['c_price']):
                     cp = item['price2']
+                    sellh = item['sellh2']
                     co = co + item['count3']
                     if (co < self.currentItem['c_price']):
                         cp = item['price3']
+                        sellh = item['sellh3']
                         co = co + item['count4']
                         if (co < self.currentItem['c_price']):
                             cp = item['price4']
+                            sellh = item['sellh4']
+                        else:
+                            co = co - item['count4']
+
             if (cp == 0):  # count1就比cPrice大了，这时候，应该取cPrice-1
                 cp = item['price1'] - 1
-            if (qz == 5):
-                cp = cp * qz * 10
-            else:
-                cp = cp * qz
             li.append(cp)
-            qz = qz - 1
-        sum = 0
-        for i in li:
-            sum = sum + i
-        sellPrice = sum / ((5 * 10 + 4 + 3 + 2 + 1))
+            sum = co
+
+        # for i in li:
+        #     sum = sum + i
+        # sellPrice = sum / ((5 * 10 + 4 + 3 + 2 + 1))
+        sellPrice = li[0]
         xs = round(math.modf(sellPrice)[0], 1)
         if (xs > 0.7):
             sellPrice = int(sellPrice) + 1
         else:
             sellPrice = int(sellPrice)
+
+        # 判断销售价最早过期时间，如果低于19小时且总量大于阈值万，则-1
+        mylog(self.dm, "不低于价格总量为：" + str(sum))
+        if (sellh < 23 and sum > self.currentItem['c_price_min']):
+            sellPrice = int(sellPrice) - 1
+            mylog(self.dm, "目前销售价存量的最早过期时间为：" + str(sellh) + ",价格-1")
+        else:
+            mylog(self.dm, "目前销售价存量的最早过期时间为：" + str(sellh))
+
         mylog(self.dm, "目前存量：" + str(data[0]))
         mylog(self.dm, "大数据智能计算销售价：" + str(sellPrice))
 
@@ -687,6 +730,6 @@ class DnfService():
         clickPic(self.dm, "dnfimg/首页弹窗关闭.bmp|dnfimg/关闭首页.bmp", 5, 0, 0, 0, 857, 880)
         MoveTo(self.dm, 511, 150)
         LeftClick(self.dm)
-        clickPic(self.dm, "dnfimg/关闭.bmp", 5, 0, 578, 103, 638, 144)
+        clickPic(self.dm, "dnfimg/关闭契约.bmp", 5, 0, 488,123,540,178)
         clickPic(self.dm, "dnfimg/关闭.bmp", 5, 0, 578, 103, 638, 144)
         clickPic(self.dm, "dnfimg/关闭拍卖行.bmp", 1, 0, 722, 27, 807, 60)

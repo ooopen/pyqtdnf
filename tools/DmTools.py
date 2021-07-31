@@ -150,6 +150,17 @@ def ocrJb(dm):
     return -1
 
 
+def ocrWsnum(dm):
+    i = 0
+    while (i < 100):
+        ret = dm.Ocr(717,357,780,395, "ffffff-000000", 0.9)
+        if ("" != ret):
+            return ret
+        else:
+            i = i + 1
+            time.sleep(0.01)
+    return -1
+
 def ocr2(dm):
     i = 0
     dm.MoveTo(0, 0)
