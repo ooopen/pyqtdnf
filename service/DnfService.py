@@ -77,13 +77,13 @@ class DnfService():
         time.sleep(0.5)
 
         # 计算购买的值
-        # self.calBuyPrice()
-        self.coutSell()
+        self.calBuyPrice()
+        self.upSell()
 
     ###type=[login，exchangeId]
     def loginOrExchangeId(self, type="login"):
         mylog(self.dm, type)
-
+        gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
         hwnd = FindWindow(self.dm, "WeGame", 1)
         if (hwnd == 0):
             type = "login"  # 防止wg已经退出的情况
@@ -274,8 +274,10 @@ class DnfService():
             self.currentItem['uid'], 1, int(ret))
         self.db.addIdslog(*args)
 
+
         # 计算购买的值
         self.calBuyPrice()
+        gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
         self.fastSpmPre()
 
     def fastSpmPre(self):
@@ -283,9 +285,12 @@ class DnfService():
         self.clear()
         self.dm.KeyPress(76)
         time.sleep(0.5)
-        if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
-            self.dm.KeyPress(76)
-            time.sleep(0.5)
+        for i in range(3):
+            if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
+                self.dm.KeyPress(76)
+                time.sleep(0.5)
+            else:
+                break
 
         # 判断金币是否充足，否则换角色
         ret = ocrJb(self.dm)  # 检查金币数量，金币不足上架
@@ -370,7 +375,8 @@ class DnfService():
             self.dm.KeyPress(13)
             t2 = time.time()
             msg = time.strftime("%H:%M:%S", time.localtime()) + "单价：" + ret + ";拍卖耗时：" + str(t2 - t1)
-
+            self.dm.KeyPress(13)
+            self.dm.KeyPress(13)
             MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
             self.dm.LeftDoubleClick()
             self.dm.LeftDoubleClick()
@@ -470,10 +476,10 @@ class DnfService():
 
     def upSell(self):
         item2 = self.currentItem
+        print(item2)
         item = {}
         for k, v in item2.items():
             item[k] = v
-
         if (item2 == None):
             myexit(self.dm, "currentItem为None")
             # 加价逻辑
@@ -519,17 +525,24 @@ class DnfService():
 
                 if (findPic(self.dm, "dnfimg/无色.bmp", 10, 0, 203, 263, 257, 306)[0] == 0):  # 如果无色移动过去成功
                     LeftClick(self.dm)
-                    for i in range(10):
+                    for i in range(5):
                         self.dm.KeyPress(8)
                         time.sleep(0.01)
+
                     SendString(self.dm, item['sell_price'])
+                    #光标移走
+                    MoveTo(self.dm,97,91)
+                    LeftClick(self.dm)
+                    LeftClick(self.dm)
 
                     ret = ocrsellDj(self.dm)
+                    print(ret)
                     if (ret != -1 and int(ret) == item['sell_price']):
                         MoveTo(self.dm, 372, 508)
                         LeftClick(self.dm)
                         MoveTo(self.dm, 372, 508)
                         LeftClick(self.dm)  # 48小时
+                        clickPic(self.dm, "dnfimg/开始排名.bmp", 100, 0, 249, 560, 339, 596)
                         clickPic(self.dm, "dnfimg/开始排名.bmp", 100, 0, 249, 560, 339, 596)
 
         time.sleep(0.1)
@@ -571,14 +584,17 @@ class DnfService():
                 mylog(self.dm, self.currentItem)
                 mylog(self.dm, "current id is " + ids[index]['idimg'])
                 break
-        if (self.currentItem == None):
-            myexit(self.dm, "currentItem为None")
-        self.dm.KeyPress(77)
-        if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == 0):
-            self.dm.KeyPress(77)
-        time.sleep(1)
 
-        self.dm.KeyPress(76)
+        if(self.currentItem == None):
+            mylog(self.dm, "self.currentItem is none")
+        self.clear()
+
+        for i in range(3):
+            if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
+                self.dm.KeyPress(76)
+                time.sleep(0.5)
+            else:
+                break
         time.sleep(1)
 
         # 定位到搜索栏
@@ -602,10 +618,10 @@ class DnfService():
         time.sleep(1)
         count = 0
         curprice = 0
-        arr = {1: [0, 0], 2: [0, 0], 3: [0, 0], 4: [0, 0]}
+        arr = {1: [0, 0,0], 2: [0, 0,0], 3: [0, 0,0], 4: [0, 0,0]}
         ins = 0
         sh = 48
-        for i in range(60):
+        for i in range(100):
             y1 = 129
             y2 = 141
             yy1 = 125
@@ -706,7 +722,7 @@ class DnfService():
 
         # 判断销售价最早过期时间，如果低于19小时且总量大于阈值万，则-1
         mylog(self.dm, "不低于价格总量为：" + str(sum))
-        if (sellh < 23 and sum > self.currentItem['c_price_min']):
+        if (sellh < 20 and sum > self.currentItem['c_price_min']):
             sellPrice = int(sellPrice) - 1
             mylog(self.dm, "目前销售价存量的最早过期时间为：" + str(sellh) + ",价格-1")
         else:

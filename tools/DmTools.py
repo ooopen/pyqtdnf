@@ -129,7 +129,7 @@ def ocrDj(dm):
 def ocrsellDj(dm):
     i = 0
     while (i < 100):
-        ret = dm.Ocr(325, 458, 380, 485, "ffffff-000000", 0.9)
+        ret = dm.Ocr(301,447,368,492, "ffffff-000000", 0.9)
         if ("" != ret):
             return ret
         else:
