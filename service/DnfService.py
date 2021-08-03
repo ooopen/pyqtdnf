@@ -1,4 +1,3 @@
-import ctypes
 import math
 import os
 import time
@@ -349,8 +348,8 @@ class DnfService():
 
     # 不断输入enter键，持续刷新拍卖行数据
     def spmSearch(self, ):
-
-        self.dm.KeyPress(13)
+        if (gl.get_value("can_spmSearch") == 1):
+            self.dm.KeyPress(13)
         time.sleep(self.currentItem['sleep_num'])
 
     def doBuyClick(self):
@@ -374,9 +373,12 @@ class DnfService():
 
         # 如果检测到物品价格低于预设，
         if (ret != -1 and int(ret) <= item['buy_price']):
+            gl.set_value("can_spmSearch", 0)
             # mylog(self,"识别耗时："+str(time.time()-t1))
             t1 = time.time()
             print(t1 - t0)
+            self.dm.LeftClick()
+            time.sleep(0.001)
             self.dm.LeftClick()
             time.sleep(0.001)
             # self.dm.MoveTo(595, 151)
@@ -394,8 +396,16 @@ class DnfService():
             for i in range(5):
                 self.dm.KeyPress(13)
                 time.sleep(0.001)
-
-            time.sleep(0.7)
+            gl.set_value("can_spmSearch", 1)
+            MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
+            time.sleep(0.001)
+            self.dm.LeftDoubleClick()
+            time.sleep(0.001)
+            MoveTo(self.dm, 368, 548)  # 点击购买准备
+            time.sleep(0.01)
+            self.dm.LeftDoubleClick()
+            time.sleep(0.001)
+            self.dm.MoveTo(595, 141)  # 移回到价格tip
 
             retleft = ocrJb(self.dm)  # 检查金币数量，金币不足上架，换角色
             jbleft = gl.get_value("jbleft")
@@ -423,15 +433,6 @@ class DnfService():
                 mylog(self, "金币不足")
                 gl.set_value("doBuyClickThreadError", 1)  # 金币不足触发上架判断
 
-            MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
-            time.sleep(0.001)
-            self.dm.LeftDoubleClick()
-            time.sleep(0.001)
-            MoveTo(self.dm, 368, 548)  # 点击购买准备
-            self.dm.LeftDoubleClick()
-            time.sleep(0.001)
-            self.dm.MoveTo(595, 141)  # 移回到价格tip
-
         if (ret == -1):
             mylog(self, "识别单价失败")
             gl.set_value("doBuyClickThreadError", 1)
@@ -441,9 +442,11 @@ class DnfService():
         tm = time.strftime("%M", time.localtime())
         ts = time.strftime("%S", time.localtime())
         tms = round(math.modf(float(time.time()))[0], 1)
-        if (int(ts) % 10 == 0 and tms < 0.1):
+        if (int(ts) % 5 == 0 and tms < 0.1):
             MoveTo(self.dm, 368, 548)  # 点击购买准备
+            time.sleep(0.01)
             self.dm.LeftCLick()
+            time.sleep(0.01)
             self.dm.MoveTo(595, 141)  # 移回到价格tip
             if (self.dm.FindPic(627, 69, 686, 109, "dnfimg/搜索.bmp", "000000", 0.9, 0)[0] == 0):  # 如果搜索没有置灰，可能搜索失效
                 MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
@@ -640,59 +643,78 @@ class DnfService():
         SendString(self.dm, self.currentItem['object_name'])
         clickPic(self, "dnfimg/搜索.bmp", 300, 1, 627, 69, 686, 109)
         LeftClick(self.dm)
-        time.sleep(1)
+        time.sleep(2)
+        pageCount = int(self.dm.Ocr(396,503,429,524, '937639-000000',0.9))
         count = 0
         curprice = 0
         arr = {1: [0, 0, 0], 2: [0, 0, 0], 3: [0, 0, 0], 4: [0, 0, 0]}
         ins = 0
         sh = 48
-        for i in range(100):
-            y1 = 129
-            y2 = 141
-            yy1 = 125
-            yy2 = 140
+        for i in range(pageCount):
+            print(i)
+            page = ocrPmhPage(self.dm,i+1)
+            if(page == -1): #尝试多按一次
+                time.sleep(0.1)
+                self.dm.KeyPress(113)
+                time.sleep(0.1)
+                page = ocrPmhPage(self.dm,i+1)
+            if(page == -1): #尝试多按一次
+                time.sleep(0.1)
+                self.dm.KeyPress(113)
+                time.sleep(0.1)
+                page = ocrPmhPage(self.dm,i+1)
 
-            yyy1 = 134
-            yyy2 = 153
+            if(page == i+1):
+                y1 = 129
+                y2 = 141
+                yy1 = 125
+                yy2 = 140
 
-            for i in range(10):
-                ret1 = self.dm.Ocr(550, y1, 624, y2, "ffb500-000000|ff3131-000000", 0.9)  # 总价
-                y1 = y1 + 37.33333
-                y2 = y2 + 37.33333
-                ret2 = self.dm.Ocr(142, yy1, 173, yy2, "ffffff-000000|ffce31-000000", 0.9)  # 数量
-                yy1 = yy1 + 37.33333
-                yy2 = yy2 + 37.33333
+                yyy1 = 134
+                yyy2 = 153
+                ret1 = 0
+                ret2 = 0
+                for ii in range(10):
+                    ret1 = ocrPmh(self.dm, 550, y1, 624, y2, "ffb500-000000|ff3131-000000")  # 总价
+                    y1 = y1 + 37.33333
+                    y2 = y2 + 37.33333
+                    ret2 = ocrPmh(self.dm, 142, yy1, 173, yy2, "ffffff-000000|ffce31-000000")  # 数量
+                    yy1 = yy1 + 37.33333
+                    yy2 = yy2 + 37.33333
 
-                # 最后拍卖剩余时间
-                ret3 = self.dm.Ocr(425, yyy1, 444, yyy2, "e1c593-000000", 0.9)
-                yyy1 = yyy1 + 37.33333
-                yyy2 = yyy2 + 37.33333
+                    # 最后拍卖剩余时间
+                    ret3 = ocrPmh(self.dm, 425, yyy1, 444, yyy2, "e1c593-000000")
+                    yyy1 = yyy1 + 37.33333
+                    yyy2 = yyy2 + 37.33333
+                    mylog(self, [ret1, ret2])
+                    if (ret1 == -1 or ret2 == -1 or ins > 3):
+                        break
+                    price = int(int(ret1) / int(ret2))
 
-                if (ret1 == "" or ret2 == ""):
+                    if (price > curprice):
+                        if (count > 0):
+                            arr[ins] = [curprice, count, sh]
+
+                        ins = ins + 1
+                        count = 0
+                        curprice = price
+                        sh = 48
+
+                    if (int(ret3) < sh):
+                        sh = int(ret3)  # 防止48小时造成的误差，取最小为准
+
+                    count = count + int(ret2)
+
+                if (ret1 ==-1  or ret2 == -1 or ins > 3):
                     break
-                price = int(int(ret1) / int(ret2))
-                if (ret1 == "" or ret2 == "" or ins > 4):
-                    break
+                self.dm.KeyPress(113)
+                time.sleep(0.5)
+            else:
+                mylog(self,"统计出错了")
 
-                if (price > curprice):
-                    if (count > 0):
-                        arr[ins] = [curprice, count, sh]
+                return
 
-                    ins = ins + 1
-                    count = 0
-                    curprice = price
-                    sh = 48
 
-                if (int(ret3) < sh):
-                    sh = int(ret3)  # 防止48小时造成的误差，取最小为准
-
-                count = count + int(ret2)
-
-            if (ret1 == "" or ret2 == "" or ins > 4):
-                break
-
-            self.dm.KeyPress(113)
-            time.sleep(1)
         mypricelog(self, self.currentItem['id'], arr)
         # 入库
         if (arr[1][0] == 0):
@@ -725,12 +747,8 @@ class DnfService():
                     if (co < self.currentItem['c_price']):
                         cp = item['price3']
                         sellh = item['sellh3']
-                        co = co + item['count4']
-                        if (co < self.currentItem['c_price']):
-                            cp = item['price4']
-                            sellh = item['sellh4']
-                        else:
-                            co = co - item['count4']
+                    else:
+                        co = co - item['count3']
 
             if (cp == 0):  # count1就比cPrice大了，这时候，应该取cPrice-1
                 cp = item['price1'] - 1
@@ -751,8 +769,8 @@ class DnfService():
         mylog(self, "不低于价格总量为：" + str(sum))
         if (sellh < 20 and sum > self.currentItem['c_price_min']):
 
-            if (sum == data[0]['count1'] or data[0]['count1'] < 1000000 or (
-                    data[0]['count1'] + data[0]['count2']) < 1000000):  # 如果前面都是这个销售价的数据，则放弃-1，因为扫不到
+            if (sum == data[0]['count1'] or (data[0]['count1'] < 2000000 and data[0]['count2'] +2100000 > self.currentItem['c_price']) or (
+                    data[0]['count1'] + data[0]['count2']) < 2000000):  # 如果前面都是这个销售价的数据，则放弃-1，因为扫不到
                 mylog(self, "目前销售存量基本都是销售价")
             else:
                 sellPrice = int(sellPrice) - 1

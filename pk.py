@@ -5,10 +5,10 @@ if __name__ == '__main__':
         'DnfNew.py',
         '--clean',
         '-y',#覆盖
-        '-w',#调试模式
+        #'-w',#调试模式
         '-F',#是否单exe
-        '--add-data=dnfimg/*;./dnfimg/',
-        '--add-data=ui/*;./ui/',
+        #'--add-data=dnfimg/*;./dnfimg/',
+        #'--add-data=ui/*;./ui/',
 
     ]
     run(opts)

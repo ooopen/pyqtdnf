@@ -111,6 +111,7 @@ class MainWindow(QWidget):
         self.model.spmhPre()
 
     def spmSearchThreadTarget(self):
+        gl.set_value("can_spmSearch",1)
         while (1):
             self.model.spmSearch()
 
@@ -251,5 +252,6 @@ class MainWindow(QWidget):
 app = QApplication([])
 stats = MainWindow()
 stats.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+stats.move(1137, 0)
 stats.show()
 app.exec_()

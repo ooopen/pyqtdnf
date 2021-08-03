@@ -68,7 +68,7 @@ def clickPic(self, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800):
             i = i + 1
     mylog(self, "fail to find：" + img)
     if (iskill == 1):
-        myexit(dm, 1)
+        myexit(self, 1)
 
 
 def findPic(self, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800, color="000000"):
@@ -85,7 +85,7 @@ def findPic(self, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800, color="000
             time.sleep(0.01)
     mylog(self, "fail to find：" + img)
     if (iskill == 1):
-        myexit(dm, 1)
+        myexit(self, 1)
     return ret
 
 
@@ -115,13 +115,13 @@ def findColor(self, num=10, iskill=0, x1=0, y1=0, color1="", x2=0, y2=0, color2=
             time.sleep(0.01)
     mylog(self, "fail to find：" + color1 + "|" + color2)
     if (iskill == 1):
-        myexit(dm, 1)
+        myexit(self, 1)
     return -1
 
 
 def ocrDj(dm):
     i = 0
-    while (i < 100):
+    while (i < 500):
         ret = dm.Ocr(526, 139, 543, 148, "ffffff-000000", 0.9)
         if ("" != ret):
             return ret
@@ -133,7 +133,7 @@ def ocrDj(dm):
 def ocrsellDj(dm):
     i = 0
     while (i < 100):
-        ret = dm.Ocr(301,447,368,492, "ffffff-000000", 0.9)
+        ret = dm.Ocr(301, 447, 368, 492, "ffffff-000000", 0.9)
         if ("" != ret):
             return ret
         else:
@@ -157,13 +157,38 @@ def ocrJb(dm):
 def ocrWsnum(dm):
     i = 0
     while (i < 100):
-        ret = dm.Ocr(717,357,780,395, "ffffff-000000", 0.9)
+        ret = dm.Ocr(717, 357, 780, 395, "ffffff-000000", 0.9)
         if ("" != ret):
             return ret
         else:
             i = i + 1
             time.sleep(0.01)
     return -1
+
+
+def ocrPmh(dm, x1, y1, x2, y2, color):
+    i = 0
+    while (i < 50):
+        ret = dm.Ocr(x1, y1, x2, y2, color, 0.9)
+        if ("" != ret):
+            return ret
+        else:
+            i = i + 1
+            time.sleep(0.1)
+    return -1
+
+
+def ocrPmhPage(dm,num):
+    i = 0
+    while (i < 20):
+        ret = dm.Ocr(379,503,398,528, '937639-000000',0.9)
+        if (num == int(ret)):
+            return int(ret)
+        else:
+            i = i + 1
+            time.sleep(0.1)
+    return -1
+
 
 def ocr2(dm):
     i = 0
@@ -199,7 +224,7 @@ def FindWindow(self, title, num=20, iskill=0):
             time.sleep(1)
     mylog(self, "fail to find：" + title)
     if (iskill == 1):
-        myexit(dm, "没有找到窗口" + title)
+        myexit(self, "没有找到窗口" + title)
     return 0
 
 
@@ -237,7 +262,6 @@ def varname(p):
 
 
 def mylog(self, msg):
-
     msg = str(msg)
     msg = time.strftime("%H:%M:%S", time.localtime()) + ":" + str(msg)
 
@@ -247,7 +271,7 @@ def mylog(self, msg):
     print(msg)
     file = "runtime" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
     dm.WriteFile("log/" + file, msg + "\r\n")
-    #写日志到数据库
+    # 写日志到数据库
     md = DnfModel()
     arg = (0, msg)
     md.addSyslog(*arg)
@@ -257,13 +281,13 @@ def mypricelog(self, id, msg):
     dm = self.getDm()
 
     msg = time.strftime("%H:%M:%S", time.localtime()) + "-" + str(msg)
+    self.signal1.emit(msg)
     print(msg)
     file = str(id) + "-" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
     dm.WriteFile("log/" + file, msg + "\r\n")
 
 
 def myexit(self, code):
-
     dm = self.getDm()
     mylog(self, code)
     gl.set_value("networkError", 1)
