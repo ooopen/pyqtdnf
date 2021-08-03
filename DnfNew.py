@@ -42,7 +42,7 @@ class MainWindow(QWidget):
 
     # 界面配置信息，先写死
 
-
+    signal1 = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -51,6 +51,7 @@ class MainWindow(QWidget):
         self.ui.setupUi(self)
 
         self.model = DnfService()
+        self.model.signal1 = self.signal1
 
         self.ui.pushButton_3.clicked.connect(lambda: self.start("restart"))
         self.ui.pushButton.clicked.connect(lambda: self.start("admin"))
@@ -63,17 +64,26 @@ class MainWindow(QWidget):
         gl._init()
         gl._init_cache()
 
+        self.signal1.connect(self.updateview)
+    def getDm(self):
+        return self.model.dm
+
+    def updateview(self, text):  # 更新页面执行
+        self.ui.textBrowser.append(text)  # 文本框逐条添加数据
+        self.ui.textBrowser.moveCursor(self.ui.textBrowser.textCursor().End)  # 文本框显示到底部
+
     def testCurrent(self):
+        #mylog(self, "start")
         self.currentThread = self.runThread(self.currentThread, self.currentThreadTarget)
 
     def start(self, admin=None):
-        mylog(self.model.dm, "start")
+        mylog(self, "start")
 
-        #还原加价标识，防止影响到其他角色或场景
+        # 还原加价标识，防止影响到其他角色或场景
         gl.set_cache("changePrice", False)
         gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
 
-        #还原加价标识，防止影响到其他角色或场景
+        # 还原加价标识，防止影响到其他角色或场景
         gl.set_cache("changePrice", False)
 
         self.demonThread = self.runThread(self.demonThread, self.demonThreadTarget)
@@ -132,33 +142,33 @@ class MainWindow(QWidget):
             etime = int(time.time())
             if (stime != 0 and etime - stime > self.checkTime and etime - stime < self.checkTime + 5):
                 self.stop()
-                mylog(self.model.dm, "抢购异常")
+                mylog(self, "抢购异常")
                 self.model.warnning()
                 self.stop()
                 gl.set_value("loginThread", 1)
                 time.sleep(5)
-            #5分钟没有试图抢拍，说明效率不高，切换账号
+            # 5分钟没有试图抢拍，说明效率不高，切换账号
             stime = gl.get_cache("lastTryDoBuyClickTime")
             etime = int(time.time())
             if (stime != 0 and etime - stime > 300 and etime - stime < 305):
                 self.stop()
-                mylog(self.model.dm, "5分钟没有试图扫拍，切换账号")
+                mylog(self, "5分钟没有试图扫拍，切换账号")
                 self.stop()
                 gl.set_value("exchangeIdThread", 1)
                 time.sleep(5)
 
             if (gl.get_value("doBuyClickThreadError") == 1):  # 扫拍异常修复
-                mylog(self.model.dm, "doBuyClickThreadError")
+                mylog(self, "doBuyClickThreadError")
                 self.stop()
                 tm = time.strftime("%M", time.localtime())
                 th = time.strftime("%H", time.localtime())
-                if(int(th) == 0 and int(tm) < 10): #凌晨0点才用
+                if (int(th) == 0 and int(tm) < 10):  # 凌晨0点才用
                     gl.set_value("spmPreThread", 1)
                 else:
                     self.model.fastSpmPre()
 
             if (gl.get_value("JbChangeId") == 1):  # 换id
-                mylog(self.model.dm, "JbChangeId")
+                mylog(self, "JbChangeId")
                 self.stop()
                 self.model.getMail()
                 self.model.upSell()
@@ -166,31 +176,28 @@ class MainWindow(QWidget):
                 gl.set_value("exchangeIdThread", 1)
 
             if (gl.get_value("JbChangeRole") == 1):  # 换role
-                mylog(self.model.dm, "JbChangeRole")
+                mylog(self, "JbChangeRole")
                 self.stop()
                 gl.set_value("exchangeRoleThread", 1)
 
             if (gl.get_value("networkError") == 1):  # 网络错误，直接重启
-                mylog(self.model.dm, "networkError")
+                mylog(self, "networkError")
                 self.stop()
                 gl.set_value("loginThread", 1)
-
 
             # 加价逻辑，以试图抢购为依据，如果长时间没有抢购，触发加价判断
             # stime = gl.get_cache("lastTryDoBuyClickTime")
             # etime = int(time.time())
             # if (stime != 0 and etime - stime > self.checkPriceTime and etime - stime < self.checkPriceTime + 2):
-            #     mylog(self.model.dm, "触发加价判断")
+            #     mylog(self, "触发加价判断")
             #     self.stop()
             #
             #     self.model.changePrice()
             #     gl.set_value("spmPreThread", 1)
             #     time.sleep(3)
 
-
-
     def stop(self, items=null):  # 停止子线程
-        mylog(self.model.dm, "stop")
+        mylog(self, "stop")
         gl._init()
         if (items == null):
             items = [self.loginThread, self.spmPreThread, self.spmSearchThread, self.doBuyClickThread,
@@ -209,11 +216,11 @@ class MainWindow(QWidget):
                 self._async_raise(i.ident, SystemExit)
 
     def runThread(self, thread, target):
-        mylog(self.model.dm, "begin " + target.__name__)
+        mylog(self, "begin " + target.__name__)
         if (thread != null and thread.is_alive()):
-            self._async_raise(thread.ident,SystemExit)
-            #return thread  # 不重复开启线程
-        mylog(self.model.dm, target.__name__)
+            self._async_raise(thread.ident, SystemExit)
+            # return thread  # 不重复开启线程
+        mylog(self, target.__name__)
         thread = Thread(target=target, name=target.__name__,
                         args=()  # 元组
                         )
@@ -243,5 +250,6 @@ class MainWindow(QWidget):
 
 app = QApplication([])
 stats = MainWindow()
+stats.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
 stats.show()
 app.exec_()

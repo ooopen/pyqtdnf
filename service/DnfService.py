@@ -43,9 +43,12 @@ class DnfService():
 
         self.db = DnfModel()
 
+    def getDm(self):
+        return self.dm
+
     def initWindow(self, title="地下城与勇士", num=4, isKill=0):
 
-        hwnd = FindWindow(self.dm, title, num, isKill)
+        hwnd = FindWindow(self, title, num, isKill)
         if (hwnd != 0):
             self.dm.SetWindowState(hwnd, 1)
             self.dm.MoveWindow(hwnd, 0, 0)
@@ -55,23 +58,23 @@ class DnfService():
         self.clear()
         # 判断当前角色
         self.dm.KeyPress(77)
-        if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
+        if (findPic(self, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
             self.dm.KeyPress(77)
         time.sleep(1)
         ids = self.db.getConfig()
 
         for index in range(len(ids)):
-            if (findPic(self.dm, ids[index]['idimg'], 10, 0, 187, 182, 339, 315)[0] == 0):
+            if (findPic(self, ids[index]['idimg'], 10, 0, 187, 182, 339, 315)[0] == 0):
                 self.currentItem = ids[index]
-                mylog(self.dm, self.currentItem)
-                mylog(self.dm, "current id is " + ids[index]['idimg'])
+                mylog(self, self.currentItem)
+                mylog(self, "current id is " + ids[index]['idimg'])
                 break
             if (index + 1 == len(ids)):
-                mylog(self.dm, "id is not found")
+                mylog(self, "id is not found")
                 gl.set_value("networkError", 1)
                 return
         if (self.currentItem == None):
-            myexit(self.dm, "currentItem为None")
+            myexit(self, "currentItem为None")
 
         self.dm.KeyPress(77)  # 关闭角色信息
         time.sleep(0.5)
@@ -82,18 +85,18 @@ class DnfService():
 
     ###type=[login，exchangeId]
     def loginOrExchangeId(self, type="login"):
-        mylog(self.dm, type)
+        mylog(self, type)
         gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
-        hwnd = FindWindow(self.dm, "WeGame", 1)
+        hwnd = FindWindow(self, "WeGame", 1)
         if (hwnd == 0):
             type = "login"  # 防止wg已经退出的情况
 
         if (type == "login"):
             # 重启dnf和wegame
             print("restart wg")
-            hwnd = FindWindow(self.dm, "地下城与勇士", 1)
+            hwnd = FindWindow(self, "地下城与勇士", 1)
             self.dm.SetWindowState(hwnd, 0)
-            hwnd = FindWindow(self.dm, "WeGame", 1)
+            hwnd = FindWindow(self, "WeGame", 1)
             self.dm.SetWindowState(hwnd, 0)
             self.dm.SetWindowState(hwnd, 13)
             time.sleep(1)
@@ -115,11 +118,11 @@ class DnfService():
             # 关闭游戏
             self.initWindow("WeGame", 10, 1)
             time.sleep(1)
-            clickPic(self.dm, "dnfimg/wg首页.bmp", 50, 0, 0, 0, 1300, 1200)
-            clickPic(self.dm, "dnfimg/wg地下城.bmp", 20, 0, 0, 0, 1300, 1200)
-            clickPic(self.dm, "dnfimg/关闭应用1.bmp", 20, 1, 1198, 747, 1286, 839)
-            clickPic(self.dm, "dnfimg/关闭应用2.bmp", 20, 1, 1001, 693, 1139, 752)
-            clickPic(self.dm, "dnfimg/关闭应用3.bmp", 20, 1, 673, 485, 1187, 788)
+            clickPic(self, "dnfimg/wg首页.bmp", 50, 0, 0, 0, 1300, 1200)
+            clickPic(self, "dnfimg/wg地下城.bmp", 20, 0, 0, 0, 1300, 1200)
+            clickPic(self, "dnfimg/关闭应用1.bmp", 20, 1, 1198, 747, 1286, 839)
+            clickPic(self, "dnfimg/关闭应用2.bmp", 20, 1, 1001, 693, 1139, 752)
+            clickPic(self, "dnfimg/关闭应用3.bmp", 20, 1, 673, 485, 1187, 788)
 
             # 点击切换账号
             self.initWindow("WeGame", 10, 1)
@@ -132,7 +135,7 @@ class DnfService():
 
         # 重启wg后如果wg是已登录状态，则直接启动
         if (type == "login"):
-            ret = findPic(self.dm, "dnfimg/wg已登录.bmp", 50, 0, 0, 0, 200, 200)
+            ret = findPic(self, "dnfimg/wg已登录.bmp", 50, 0, 0, 0, 200, 200)
             if (ret[0] == 0):
                 self.startGame()
                 return
@@ -140,7 +143,7 @@ class DnfService():
         # 登录界面
         self.initWindow("WeGame", 10, 1)
         time.sleep(1)
-        findColor(self.dm, 10, 1, 821, 218, "5f5f60-000000", 681, 335, "f2c113-000000")  # 找到登录界面
+        findColor(self, 10, 1, 821, 218, "5f5f60-000000", 681, 335, "f2c113-000000")  # 找到登录界面
 
         if (type == "exchangeId"):
             MoveTo(self.dm, 821, 218)
@@ -158,10 +161,10 @@ class DnfService():
         time.sleep(1)
 
         # 如果弹出滑动验证码，则处理
-        ret = findPic(self.dm, "dnfimg/滑条.bmp", 50, 0, 0, 0, 941, 679)
+        ret = findPic(self, "dnfimg/滑条.bmp", 50, 0, 0, 0, 941, 679)
         if (ret[0] == 0):
             for i in range(8):
-                ret = findPic(self.dm, "dnfimg/滑条.bmp", 50, 0, 0, 0, 941, 679)
+                ret = findPic(self, "dnfimg/滑条.bmp", 50, 0, 0, 0, 941, 679)
                 MoveTo(self.dm, ret[1], ret[2])
                 self.dm.LeftDown()
                 time.sleep(0.1)
@@ -169,7 +172,7 @@ class DnfService():
                 time.sleep(0.1)
                 self.dm.LeftUp()
                 time.sleep(1)
-                ret = findPic(self.dm, "dnfimg/滑条err.bmp", 50, 0, 0, 0, 941, 679)
+                ret = findPic(self, "dnfimg/滑条err.bmp", 50, 0, 0, 0, 941, 679)
                 if (ret[0] != 0):
                     break
                 time.sleep(1)
@@ -178,7 +181,7 @@ class DnfService():
                 LeftClick(self.dm)
                 time.sleep(1)
                 if (i == 7):
-                    myexit(self.dm, "verification code is not auth")
+                    myexit(self, "verification code is not auth")
             time.sleep(2)
 
         self.startGame()
@@ -188,21 +191,21 @@ class DnfService():
         self.initWindow("WeGame", 4, 1)
         time.sleep(1)
         for i in range(10):
-            ret = findPic(self.dm, "dnfimg/wg已登录.bmp", 10, 0, 0, 0, 200, 200)
+            ret = findPic(self, "dnfimg/wg已登录.bmp", 10, 0, 0, 0, 200, 200)
             if (ret[0] == 0):
                 break
             time.sleep(1)
 
-        clickPic(self.dm, "dnfimg/wg首页.bmp", 20, 0, 0, 0, 1300, 1200)
-        clickPic(self.dm, "dnfimg/wg地下城.bmp", 20, 0, 0, 0, 1300, 1200)
-        clickPic(self.dm, "dnfimg/协议.bmp", 20, 0, 0, 0, 1300, 1200)
-        clickPic(self.dm, "dnfimg/启动.bmp", 20, 1, 0, 0, 1300, 1200)
+        clickPic(self, "dnfimg/wg首页.bmp", 20, 0, 0, 0, 1300, 1200)
+        clickPic(self, "dnfimg/wg地下城.bmp", 20, 0, 0, 0, 1300, 1200)
+        clickPic(self, "dnfimg/协议.bmp", 20, 0, 0, 0, 1300, 1200)
+        clickPic(self, "dnfimg/启动.bmp", 20, 1, 0, 0, 1300, 1200)
         MoveTo(self.dm, 1215, 17)
         LeftClick(self.dm)
         time.sleep(20)
         self.initWindow("地下城与勇士", 30)
         time.sleep(10)
-        findPic(self.dm, "dnfimg/游戏开始.bmp", 4000, 1)
+        findPic(self, "dnfimg/游戏开始.bmp", 4000, 1)
         MoveTo(self.dm, 67, 443)  # 默认第一个角色
         LeftClick(self.dm)
         MoveTo(self.dm, 410, 570)
@@ -210,7 +213,7 @@ class DnfService():
         self.dm.LeftDoubleClick()
         self.dm.LeftDoubleClick()
         time.sleep(5)
-        findPic(self.dm, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
+        findPic(self, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
         # 统计拍卖行行情
         self.coutSell()
 
@@ -230,8 +233,8 @@ class DnfService():
         self.clear()
         self.dm.KeyPress(27)  #
         time.sleep(1)
-        clickPic(self.dm, "dnfimg/选择角色.bmp", 50, 1, 331, 413, 436, 497)
-        findPic(self.dm, "dnfimg/游戏开始.bmp", 2000, 1)
+        clickPic(self, "dnfimg/选择角色.bmp", 50, 1, 331, 413, 436, 497)
+        findPic(self, "dnfimg/游戏开始.bmp", 2000, 1)
         time.sleep(1)
 
         MoveTo(self.dm, self.currentItem['nextRole']['x'], self.currentItem['nextRole']['y'], )  # 默认第一个角色
@@ -242,7 +245,7 @@ class DnfService():
         LeftClick(self.dm)  # 防止没点到开始
         LeftClick(self.dm)  # 防止没点到开始
         time.sleep(10)
-        findPic(self.dm, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
+        findPic(self, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
         gl.set_value("spmPreThread", 1)
 
     def spmhPre(self):
@@ -250,29 +253,29 @@ class DnfService():
         self.clear()
         # 判断当前角色
         self.dm.KeyPress(77)
-        if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
+        if (findPic(self, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
             self.dm.KeyPress(77)
         time.sleep(1)
         ids = self.db.getConfig()
 
         for index in range(len(ids)):
-            if (findPic(self.dm, ids[index]['idimg'], 10, 0, 187, 182, 339, 315)[0] == 0):
+            if (findPic(self, ids[index]['idimg'], 10, 0, 187, 182, 339, 315)[0] == 0):
                 self.currentItem = ids[index]
-                mylog(self.dm, self.currentItem)
-                mylog(self.dm, "current id is " + ids[index]['idimg'])
+                mylog(self, self.currentItem)
+                mylog(self, "current id is " + ids[index]['idimg'])
                 break
             if (index + 1 == len(ids)):
-                mylog(self.dm, "id is not found")
+                mylog(self, "id is not found")
                 gl.set_value("networkError", 1)
                 return
         if (self.currentItem == None):
-            myexit(self.dm, "currentItem为None")
+            myexit(self, "currentItem为None")
 
         # 记录角色信息日志
         self.clear()
         self.dm.KeyPress(76)
         time.sleep(0.5)
-        if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
+        if (findPic(self, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
             self.dm.KeyPress(76)
             time.sleep(0.5)
         ret = ocrJb(self.dm)
@@ -291,7 +294,7 @@ class DnfService():
         self.dm.KeyPress(76)
         time.sleep(0.5)
         for i in range(3):
-            if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
+            if (findPic(self, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
                 self.dm.KeyPress(76)
                 time.sleep(0.5)
             else:
@@ -299,18 +302,18 @@ class DnfService():
 
         # 判断金币是否充足，否则换角色
         ret = ocrJb(self.dm)  # 检查金币数量，金币不足上架
-        mylog(self.dm, ret)
+        mylog(self, ret)
 
         gl.set_value("jbleft", ret)  # 为第一次购买成功计算依据
 
         if (ret != -1 and int(ret) > 5000000):
 
-            mylog(self.dm, "金币充足，继续扫拍")
+            mylog(self, "金币充足，继续扫拍")
 
         else:
 
             # 更换角色
-            mylog(self.dm, "金币不足")
+            mylog(self, "金币不足")
             # 由于金币不足导致的切换，重置切换时间
             gl.set_cache("exchangeIdTime", 0)
             gl.set_value("JbChangeId", 1)
@@ -334,7 +337,7 @@ class DnfService():
             self.dm.KeyPress(8)
             time.sleep(0.01)
         SendString(self.dm, self.currentItem['object_name'])
-        clickPic(self.dm, "dnfimg/搜索.bmp", 300, 1, 627, 69, 686, 109)
+        clickPic(self, "dnfimg/搜索.bmp", 300, 1, 627, 69, 686, 109)
         self.dm.MoveTo(368, 548)  # 点击购买准备
         self.dm.LeftDoubleClick()
         self.dm.LeftDoubleClick()
@@ -354,13 +357,13 @@ class DnfService():
 
         item2 = self.currentItem
         if (item2 == None):
-            myexit(self.dm, "currentItem为None")
+            myexit(self, "currentItem为None")
         item = {}
         for k, v in item2.items():
             item[k] = v
 
         if (item == None):
-            myexit(self.dm, "currentItem为None")
+            myexit(self, "currentItem为None")
 
         # #加价逻辑
         if (gl.get_cache("changePrice") == True):
@@ -371,18 +374,18 @@ class DnfService():
 
         # 如果检测到物品价格低于预设，
         if (ret != -1 and int(ret) <= item['buy_price']):
-            # mylog(self.dm,"识别耗时："+str(time.time()-t1))
+            # mylog(self,"识别耗时："+str(time.time()-t1))
             t1 = time.time()
             print(t1 - t0)
             self.dm.LeftClick()
             time.sleep(0.001)
-            #self.dm.MoveTo(595, 151)
-            #self.dm.LeftClick()
-            #self.dm.MoveTo(528,161)
-            #time.sleep(0.001)
-            #self.dm.LeftClick()
-            #self.dm.LeftClick()
-            #time.sleep(0.001)
+            # self.dm.MoveTo(595, 151)
+            # self.dm.LeftClick()
+            # self.dm.MoveTo(528,161)
+            # time.sleep(0.001)
+            # self.dm.LeftClick()
+            # self.dm.LeftClick()
+            # time.sleep(0.001)
             self.dm.KeyPress(13)
             time.sleep(0.001)
             self.dm.KeyPress(13)
@@ -405,7 +408,7 @@ class DnfService():
                 status = "成功"
                 is_succ = 1
                 num = (int(jbleft) - int(retleft)) / int(ret)
-            mylog(self.dm, msg + "=>" + "数量：" + str(num) + "|" + status)
+            mylog(self, msg + "=>" + "数量：" + str(num) + "|" + status)
 
             gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 终极大招和涨价的判断依据
 
@@ -417,19 +420,20 @@ class DnfService():
             self.db.addBuylog(*args)
 
             if (retleft != -1 and int(retleft) < 5000000):
-                mylog(self.dm, "金币不足")
+                mylog(self, "金币不足")
                 gl.set_value("doBuyClickThreadError", 1)  # 金币不足触发上架判断
 
-
             MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
+            time.sleep(0.001)
             self.dm.LeftDoubleClick()
-            time.sleep(0.1)
+            time.sleep(0.001)
             MoveTo(self.dm, 368, 548)  # 点击购买准备
             self.dm.LeftDoubleClick()
+            time.sleep(0.001)
             self.dm.MoveTo(595, 141)  # 移回到价格tip
 
         if (ret == -1):
-            mylog(self.dm, "识别单价失败")
+            mylog(self, "识别单价失败")
             gl.set_value("doBuyClickThreadError", 1)
             time.sleep(3)
 
@@ -455,14 +459,14 @@ class DnfService():
         ts = gl.get_cache("exchangeIdTime")
         if (ts != 0 and te - ts > self.exchangeIdTime):
             gl.set_cache("exchangeIdTime", 0)
-            mylog(self.dm, "定时切换账号")
+            mylog(self, "定时切换账号")
             gl.set_value("JbChangeId", 1)
             time.sleep(3)
 
     def getMail(self):
         self.clear()
         for i in range(20):
-            ret = findPic(self.dm, "dnfimg/邮件.bmp|dnfimg/邮件1.bmp", 1, 0, 685, 463, 801, 541)
+            ret = findPic(self, "dnfimg/邮件.bmp|dnfimg/邮件1.bmp", 1, 0, 685, 463, 801, 541)
             if (ret[0] >= 0):  # 如果有邮件
                 MoveTo(self.dm, ret[1], ret[2])
                 LeftClick(self.dm)
@@ -485,11 +489,11 @@ class DnfService():
         if (count == 0):
             return
         if (count < self.currentItem['c_price']):
-            mylog(self.dm, "目前售价为：" + str(self.currentItem['sell_price']) + ",当前售卖价不大于" + str(newPrice) + "的数量有：" + str(
+            mylog(self, "目前售价为：" + str(self.currentItem['sell_price']) + ",当前售卖价不大于" + str(newPrice) + "的数量有：" + str(
                 count) + ",价格+1")
             gl.set_cache("changePrice", True)
         else:
-            mylog(self.dm, "目前售价为：" + str(self.currentItem['sell_price']) + ",当前售卖价不大于" + str(newPrice) + "的数量有：" + str(
+            mylog(self, "目前售价为：" + str(self.currentItem['sell_price']) + ",当前售卖价不大于" + str(newPrice) + "的数量有：" + str(
                 count) + ",不符合加价条件")
             gl.set_cache("changePrice", False)
 
@@ -500,21 +504,21 @@ class DnfService():
         for k, v in item2.items():
             item[k] = v
         if (item2 == None):
-            myexit(self.dm, "currentItem为None")
+            myexit(self, "currentItem为None")
             # 加价逻辑
         if (gl.get_cache("changePrice") == True):
             item['sell_price'] = item['sell_price'] + 1
 
         self.clear()
-        if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
+        if (findPic(self, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
             self.dm.KeyPress(76)
             time.sleep(1)
 
-        clickPic(self.dm, "dnfimg/上架拍卖品.bmp", 100, 0, 0, 508, 117, 591)
-        clickPic(self.dm, "dnfimg/上架拍卖品.bmp", 1, 0, 0, 508, 117, 591)
+        clickPic(self, "dnfimg/上架拍卖品.bmp", 100, 0, 0, 508, 117, 591)
+        clickPic(self, "dnfimg/上架拍卖品.bmp", 1, 0, 0, 508, 117, 591)
         time.sleep(1)
 
-        ret = findPic(self.dm, "dnfimg/装备栏.bmp", 10, 0, 401, 0, 710, 170)
+        ret = findPic(self, "dnfimg/装备栏.bmp", 10, 0, 401, 0, 710, 170)
         if (ret[0] == 0):  # 为了点击材料栏
             MoveTo(self.dm, ret[1] + 25, ret[2] + 239)  # 点击材料栏
             time.sleep(0.1)
@@ -526,7 +530,7 @@ class DnfService():
             LeftClick(self.dm)
             time.sleep(0.1)
         time.sleep(0.5)
-        ret = findPic(self.dm, "dnfimg/无色.bmp", 10, 0, 698, 312, 803, 470)
+        ret = findPic(self, "dnfimg/无色.bmp", 10, 0, 698, 312, 803, 470)
         if (ret[0] == 0):  #
 
             # 数量大于50万才上架
@@ -542,7 +546,7 @@ class DnfService():
                 LeftClick(self.dm)  # 点确定
                 MoveTo(self.dm, 397, 471)
 
-                if (findPic(self.dm, "dnfimg/无色.bmp", 10, 0, 203, 263, 257, 306)[0] == 0):  # 如果无色移动过去成功
+                if (findPic(self, "dnfimg/无色.bmp", 10, 0, 203, 263, 257, 306)[0] == 0):  # 如果无色移动过去成功
                     time.sleep(2)  # 移过去会卡顿有可能
                     LeftClick(self.dm)
                     for i in range(5):
@@ -563,8 +567,8 @@ class DnfService():
                         LeftClick(self.dm)
                         MoveTo(self.dm, 372, 508)
                         LeftClick(self.dm)  # 48小时
-                        clickPic(self.dm, "dnfimg/开始排名.bmp", 100, 0, 249, 560, 339, 596)
-                        clickPic(self.dm, "dnfimg/开始排名.bmp", 100, 0, 249, 560, 339, 596)
+                        clickPic(self, "dnfimg/开始排名.bmp", 100, 0, 249, 560, 339, 596)
+                        clickPic(self, "dnfimg/开始排名.bmp", 100, 0, 249, 560, 339, 596)
 
         time.sleep(0.1)
         self.dm.KeyPress(27)  # 重置一下
@@ -590,28 +594,28 @@ class DnfService():
         time.sleep(1)
         color2 = self.dm.GetColor(9, 583)
         if (color2 == color1):
-            mylog(self.dm, "终极大招检查失败")
+            mylog(self, "终极大招检查失败")
 
     def coutSell(self):
         self.clear()
         for i in range(3):
-            if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
+            if (findPic(self, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
                 self.dm.KeyPress(77)
         ids = self.db.getConfig()
         time.sleep(1)
         for index in range(len(ids)):
-            if (findPic(self.dm, ids[index]['idimg'], 10, 0, 156, 204, 344, 303)[0] == 0):
+            if (findPic(self, ids[index]['idimg'], 10, 0, 156, 204, 344, 303)[0] == 0):
                 self.currentItem = ids[index]
-                mylog(self.dm, self.currentItem)
-                mylog(self.dm, "current id is " + ids[index]['idimg'])
+                mylog(self, self.currentItem)
+                mylog(self, "current id is " + ids[index]['idimg'])
                 break
 
         if (self.currentItem == None):
-            myexit(self.dm, "currentItem为None")
+            myexit(self, "currentItem为None")
         self.clear()
 
         for i in range(3):
-            if (findPic(self.dm, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
+            if (findPic(self, "dnfimg/搜索.bmp", 10, 0, 627, 69, 686, 109)[0] != 0):  # 打开拍卖行，如果没打开
                 self.dm.KeyPress(76)
                 time.sleep(0.5)
             else:
@@ -634,7 +638,7 @@ class DnfService():
             self.dm.KeyPress(8)
             time.sleep(0.01)
         SendString(self.dm, self.currentItem['object_name'])
-        clickPic(self.dm, "dnfimg/搜索.bmp", 300, 1, 627, 69, 686, 109)
+        clickPic(self, "dnfimg/搜索.bmp", 300, 1, 627, 69, 686, 109)
         LeftClick(self.dm)
         time.sleep(1)
         count = 0
@@ -689,7 +693,7 @@ class DnfService():
 
             self.dm.KeyPress(113)
             time.sleep(1)
-        mypricelog(self.dm, self.currentItem['id'], arr)
+        mypricelog(self, self.currentItem['id'], arr)
         # 入库
         if (arr[1][0] == 0):
             return
@@ -744,36 +748,36 @@ class DnfService():
             sellPrice = int(sellPrice)
 
         # 判断销售价最早过期时间，如果低于19小时且总量大于阈值万，则-1
-        mylog(self.dm, "不低于价格总量为：" + str(sum))
+        mylog(self, "不低于价格总量为：" + str(sum))
         if (sellh < 20 and sum > self.currentItem['c_price_min']):
 
             if (sum == data[0]['count1'] or data[0]['count1'] < 1000000 or (
                     data[0]['count1'] + data[0]['count2']) < 1000000):  # 如果前面都是这个销售价的数据，则放弃-1，因为扫不到
-                mylog(self.dm, "目前销售存量基本都是销售价")
+                mylog(self, "目前销售存量基本都是销售价")
             else:
                 sellPrice = int(sellPrice) - 1
-                mylog(self.dm, "目前销售价存量的最早过期时间为：" + str(sellh) + ",价格-1")
+                mylog(self, "目前销售价存量的最早过期时间为：" + str(sellh) + ",价格-1")
         else:
-            mylog(self.dm, "目前销售价存量的最早过期时间为：" + str(sellh))
+            mylog(self, "目前销售价存量的最早过期时间为：" + str(sellh))
 
-        mylog(self.dm, "目前存量：" + str(data[0]))
-        mylog(self.dm, "大数据智能计算销售价：" + str(sellPrice))
+        mylog(self, "目前存量：" + str(data[0]))
+        mylog(self, "大数据智能计算销售价：" + str(sellPrice))
 
         if (sellPrice > self.currentItem['sell_price']):
-            mylog(self.dm, "智能计算的结果为：" + str(sellPrice) + " 大于阈值:" + str(self.currentItem['sell_price']))
+            mylog(self, "智能计算的结果为：" + str(sellPrice) + " 大于阈值:" + str(self.currentItem['sell_price']))
             return
 
         self.currentItem['buy_price'] = sellPrice - 2
         self.currentItem['sell_price'] = sellPrice
-        mylog(self.dm, "智能计算结果后的currentItem：" + str(self.currentItem))
+        mylog(self, "智能计算结果后的currentItem：" + str(self.currentItem))
 
     def clear(self):
         self.initWindow()
         self.dm.KeyPress(27)  # 重置一下
         time.sleep(0.1)
-        clickPic(self.dm, "dnfimg/关闭首页.bmp|dnfimg/首页弹窗关闭.bmp", 5, 0, 0, 0, 857, 880)
+        clickPic(self, "dnfimg/关闭首页.bmp|dnfimg/首页弹窗关闭.bmp", 5, 0, 0, 0, 857, 880)
         MoveTo(self.dm, 511, 150)
         LeftClick(self.dm)
-        clickPic(self.dm, "dnfimg/关闭.bmp", 5, 0, 578, 103, 638, 144)
-        clickPic(self.dm, "dnfimg/关闭契约.bmp", 5, 0, 488, 123, 540, 178)
-        clickPic(self.dm, "dnfimg/关闭拍卖行.bmp", 1, 0, 722, 27, 807, 60)
+        clickPic(self, "dnfimg/关闭.bmp", 5, 0, 578, 103, 638, 144)
+        clickPic(self, "dnfimg/关闭契约.bmp", 5, 0, 488, 123, 540, 178)
+        clickPic(self, "dnfimg/关闭拍卖行.bmp", 1, 0, 722, 27, 807, 60)

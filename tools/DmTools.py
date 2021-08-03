@@ -53,41 +53,44 @@ def regsvr():
     return dm_1
 
 
-def clickPic(dm, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800):
+def clickPic(self, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800):
+    dm = self.getDm()
     i = 0
     MoveTo(dm, 0, 0)
     while (i < num):
         ret = dm.FindPic(x1, y1, x2, y2, img, "000000", 0.9, 0)
         if (-1 != ret[0]):
-            mylog(dm, "success find：" + img)
+            mylog(self, "success find：" + img)
             MoveTo(dm, ret[1], ret[2])
             LeftClick(dm)
             return
         else:
             i = i + 1
-    mylog(dm, "fail to find：" + img)
+    mylog(self, "fail to find：" + img)
     if (iskill == 1):
         myexit(dm, 1)
 
 
-def findPic(dm, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800, color="000000"):
+def findPic(self, img, num=10, iskill=0, x1=0, y1=0, x2=1200, y2=800, color="000000"):
+    dm = self.getDm()
     i = 0
     MoveTo(dm, 0, 0)
     while (i < num):
         ret = dm.FindPic(x1, y1, x2, y2, img, color, 0.9, 0)
         if (-1 != ret[0]):
-            mylog(dm, "success find：" + img)
+            mylog(self, "success find：" + img)
             return ret
         else:
             i = i + 1
             time.sleep(0.01)
-    mylog(dm, "fail to find：" + img)
+    mylog(self, "fail to find：" + img)
     if (iskill == 1):
         myexit(dm, 1)
     return ret
 
 
-def findCol(dm, num=10, x=0, y=0, color=""):
+def findCol(self, num=10, x=0, y=0, color=""):
+    dm = self.getDm()
     i = 0
     while (i < num):
         ret = dm.CmpColor(x, y, color, 1)
@@ -97,19 +100,20 @@ def findCol(dm, num=10, x=0, y=0, color=""):
             i = i + 1
 
 
-def findColor(dm, num=10, iskill=0, x1=0, y1=0, color1="", x2=0, y2=0, color2=""):
+def findColor(self, num=10, iskill=0, x1=0, y1=0, color1="", x2=0, y2=0, color2=""):
+    dm = self.getDm()
     i = 0
     MoveTo(dm, 0, 0)
     while (i < num):
         ret1 = dm.CmpColor(x1, y1, color1, 0.9)
         ret2 = dm.CmpColor(x2, y2, color2, 0.9)
         if (0 == ret1 and 0 == ret2):
-            mylog(dm, "success find：" + color1 + "|" + color2)
+            mylog(self, "success find：" + color1 + "|" + color2)
             return 0
         else:
             i = i + 1
             time.sleep(0.01)
-    mylog(dm, "fail to find：" + color1 + "|" + color2)
+    mylog(self, "fail to find：" + color1 + "|" + color2)
     if (iskill == 1):
         myexit(dm, 1)
     return -1
@@ -181,17 +185,19 @@ def grag(x1, y1, x2, y2):
     LeftUp()
 
 
-def FindWindow(dm, title, num=20, iskill=0):
+def FindWindow(self, title, num=20, iskill=0):
+    dm = self.getDm()
+    print(dm)
     i = 0
     while (i < num):
         ret = dm.FindWindow("", title)
         if (0 != ret):
-            mylog(dm, "success find：" + title)
+            mylog(self, "success find：" + title)
             return ret
         else:
             i = i + 1
             time.sleep(1)
-    mylog(dm, "fail to find：" + title)
+    mylog(self, "fail to find：" + title)
     if (iskill == 1):
         myexit(dm, "没有找到窗口" + title)
     return 0
@@ -230,8 +236,14 @@ def varname(p):
         return m.group(1)
 
 
-def mylog(dm, msg):
+def mylog(self, msg):
+
+    msg = str(msg)
     msg = time.strftime("%H:%M:%S", time.localtime()) + ":" + str(msg)
+
+    self.signal1.emit(msg)
+
+    dm = self.getDm()
     print(msg)
     file = "runtime" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
     dm.WriteFile("log/" + file, msg + "\r\n")
@@ -241,13 +253,17 @@ def mylog(dm, msg):
     md.addSyslog(*arg)
 
 
-def mypricelog(dm, id, msg):
+def mypricelog(self, id, msg):
+    dm = self.getDm()
+
     msg = time.strftime("%H:%M:%S", time.localtime()) + "-" + str(msg)
     print(msg)
     file = str(id) + "-" + time.strftime("%Y-%m-%d", time.localtime()) + ".txt"
     dm.WriteFile("log/" + file, msg + "\r\n")
 
 
-def myexit(dm, code):
-    mylog(dm, code)
+def myexit(self, code):
+
+    dm = self.getDm()
+    mylog(self, code)
     gl.set_value("networkError", 1)

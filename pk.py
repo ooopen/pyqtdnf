@@ -7,5 +7,8 @@ if __name__ == '__main__':
         '-y',#覆盖
         '-w',#调试模式
         '-F',#是否单exe
+        '--add-data=dnfimg/*;./dnfimg/',
+        '--add-data=ui/*;./ui/',
+
     ]
     run(opts)
