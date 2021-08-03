@@ -77,8 +77,8 @@ class DnfService():
         time.sleep(0.5)
 
         # 计算购买的值
-        self.calBuyPrice()
-        self.upSell()
+        # self.calBuyPrice()
+        self.coutSell()
 
     ###type=[login，exchangeId]
     def loginOrExchangeId(self, type="login"):
@@ -104,7 +104,8 @@ class DnfService():
             self.initWindow("WeGame", 10, 1)
 
         else:
-
+            self.getMail()
+            self.upSell()
             # 记录角色信息日志
             ret = gl.get_cache("logoutjbleft")
             args = (
@@ -186,7 +187,13 @@ class DnfService():
         # 启动游戏
         self.initWindow("WeGame", 4, 1)
         time.sleep(1)
-        clickPic(self.dm, "dnfimg/wg首页.bmp", 50, 0, 0, 0, 1300, 1200)
+        for i in range(10):
+            ret = findPic(self.dm, "dnfimg/wg已登录.bmp", 10, 0, 0, 0, 200, 200)
+            if (ret[0] == 0):
+                break
+            time.sleep(1)
+
+        clickPic(self.dm, "dnfimg/wg首页.bmp", 20, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/wg地下城.bmp", 20, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/协议.bmp", 20, 0, 0, 0, 1300, 1200)
         clickPic(self.dm, "dnfimg/启动.bmp", 20, 1, 0, 0, 1300, 1200)
@@ -196,14 +203,13 @@ class DnfService():
         self.initWindow("地下城与勇士", 30)
         time.sleep(10)
         findPic(self.dm, "dnfimg/游戏开始.bmp", 4000, 1)
-        time.sleep(1)
         MoveTo(self.dm, 67, 443)  # 默认第一个角色
-        time.sleep(1)
         LeftClick(self.dm)
         MoveTo(self.dm, 410, 570)
-        LeftClick(self.dm)  # 防止没点到开始
-        LeftClick(self.dm)  # 防止没点到开始
-        time.sleep(10)
+        time.sleep(3)
+        self.dm.LeftDoubleClick()
+        self.dm.LeftDoubleClick()
+        time.sleep(5)
         findPic(self.dm, "dnfimg/拍卖行.bmp", 3000, 1, 769, 555, 807, 592)
         # 统计拍卖行行情
         self.coutSell()
@@ -211,8 +217,8 @@ class DnfService():
         # 还原加价标识，防止影响到其他角色或场景
         gl.set_cache("changePrice", False)
 
-        #还原定时切换账号
-        gl.set_cache("exchangeIdTime",time.time())
+        # 还原定时切换账号
+        gl.set_cache("exchangeIdTime", time.time())
 
         gl.set_cache("lastTryDoBuyClickTime", int(time.time()))  # 初始化，第一次判断不进来的问题，解决终极大招的判断依据
 
@@ -273,7 +279,6 @@ class DnfService():
         args = (
             self.currentItem['uid'], 1, int(ret))
         self.db.addIdslog(*args)
-
 
         # 计算购买的值
         self.calBuyPrice()
@@ -341,8 +346,9 @@ class DnfService():
 
     # 不断输入enter键，持续刷新拍卖行数据
     def spmSearch(self, ):
+
         self.dm.KeyPress(13)
-        time.sleep(0.03)
+        time.sleep(self.currentItem['sleep_num'])
 
     def doBuyClick(self):
 
@@ -369,23 +375,24 @@ class DnfService():
             t1 = time.time()
             print(t1 - t0)
             self.dm.LeftClick()
-            self.dm.MoveTo(595, 151)
-            self.dm.LeftClick()
+            time.sleep(0.001)
+            #self.dm.MoveTo(595, 151)
+            #self.dm.LeftClick()
+            #self.dm.MoveTo(528,161)
+            #time.sleep(0.001)
+            #self.dm.LeftClick()
+            #self.dm.LeftClick()
+            #time.sleep(0.001)
             self.dm.KeyPress(13)
+            time.sleep(0.001)
             self.dm.KeyPress(13)
             t2 = time.time()
             msg = time.strftime("%H:%M:%S", time.localtime()) + "单价：" + ret + ";拍卖耗时：" + str(t2 - t1)
-            self.dm.KeyPress(13)
-            self.dm.KeyPress(13)
-            MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
-            self.dm.LeftDoubleClick()
-            self.dm.LeftDoubleClick()
-            time.sleep(0.1)
+            for i in range(5):
+                self.dm.KeyPress(13)
+                time.sleep(0.001)
 
-            MoveTo(self.dm, 368, 548)  # 点击购买准备
-            self.dm.LeftDoubleClick()
-            self.dm.LeftDoubleClick()
-            self.dm.MoveTo(595, 141)  # 移回到价格tip
+            time.sleep(0.7)
 
             retleft = ocrJb(self.dm)  # 检查金币数量，金币不足上架，换角色
             jbleft = gl.get_value("jbleft")
@@ -413,6 +420,14 @@ class DnfService():
                 mylog(self.dm, "金币不足")
                 gl.set_value("doBuyClickThreadError", 1)  # 金币不足触发上架判断
 
+
+            MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
+            self.dm.LeftDoubleClick()
+            time.sleep(0.1)
+            MoveTo(self.dm, 368, 548)  # 点击购买准备
+            self.dm.LeftDoubleClick()
+            self.dm.MoveTo(595, 141)  # 移回到价格tip
+
         if (ret == -1):
             mylog(self.dm, "识别单价失败")
             gl.set_value("doBuyClickThreadError", 1)
@@ -422,7 +437,7 @@ class DnfService():
         tm = time.strftime("%M", time.localtime())
         ts = time.strftime("%S", time.localtime())
         tms = round(math.modf(float(time.time()))[0], 1)
-        if (int(ts) % 10 == 0 and tms < 0.3):
+        if (int(ts) % 10 == 0 and tms < 0.1):
             MoveTo(self.dm, 368, 548)  # 点击购买准备
             self.dm.LeftCLick()
             self.dm.MoveTo(595, 141)  # 移回到价格tip
@@ -430,6 +445,10 @@ class DnfService():
                 MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
                 self.dm.LeftDoubleClick()
                 self.dm.MoveTo(595, 141)  # 移回到价格tip
+
+        # MoveTo(self.dm, 220, 93)  # 点击输入框，让enter键搜索生效
+        # self.dm.LeftDoubleClick()
+        # self.dm.MoveTo(595, 141)  # 移回到价格tip
 
         # 定时切换不同账号
         te = int(time.time())
@@ -506,7 +525,7 @@ class DnfService():
             LeftClick(self.dm)
             LeftClick(self.dm)
             time.sleep(0.1)
-        time.sleep(1)
+        time.sleep(0.5)
         ret = findPic(self.dm, "dnfimg/无色.bmp", 10, 0, 698, 312, 803, 470)
         if (ret[0] == 0):  #
 
@@ -524,14 +543,16 @@ class DnfService():
                 MoveTo(self.dm, 397, 471)
 
                 if (findPic(self.dm, "dnfimg/无色.bmp", 10, 0, 203, 263, 257, 306)[0] == 0):  # 如果无色移动过去成功
+                    time.sleep(2)  # 移过去会卡顿有可能
                     LeftClick(self.dm)
                     for i in range(5):
                         self.dm.KeyPress(8)
                         time.sleep(0.01)
 
                     SendString(self.dm, item['sell_price'])
-                    #光标移走
-                    MoveTo(self.dm,97,91)
+                    time.sleep(0.5)
+                    # 光标移走
+                    MoveTo(self.dm, 97, 91)
                     LeftClick(self.dm)
                     LeftClick(self.dm)
 
@@ -573,9 +594,9 @@ class DnfService():
 
     def coutSell(self):
         self.clear()
-        self.dm.KeyPress(77)
-        if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
-            self.dm.KeyPress(77)
+        for i in range(3):
+            if (findPic(self.dm, "dnfimg/个人信息.bmp", 50, 0, 181, 2, 315, 125)[0] == -1):
+                self.dm.KeyPress(77)
         ids = self.db.getConfig()
         time.sleep(1)
         for index in range(len(ids)):
@@ -585,8 +606,8 @@ class DnfService():
                 mylog(self.dm, "current id is " + ids[index]['idimg'])
                 break
 
-        if(self.currentItem == None):
-            mylog(self.dm, "self.currentItem is none")
+        if (self.currentItem == None):
+            myexit(self.dm, "currentItem为None")
         self.clear()
 
         for i in range(3):
@@ -618,7 +639,7 @@ class DnfService():
         time.sleep(1)
         count = 0
         curprice = 0
-        arr = {1: [0, 0,0], 2: [0, 0,0], 3: [0, 0,0], 4: [0, 0,0]}
+        arr = {1: [0, 0, 0], 2: [0, 0, 0], 3: [0, 0, 0], 4: [0, 0, 0]}
         ins = 0
         sh = 48
         for i in range(100):
@@ -670,6 +691,8 @@ class DnfService():
             time.sleep(1)
         mypricelog(self.dm, self.currentItem['id'], arr)
         # 入库
+        if (arr[1][0] == 0):
+            return
         args = (
             self.currentItem['id'], self.currentItem['gzone_id'], arr[1][0], arr[1][1], arr[1][2], arr[2][0], arr[2][1],
             arr[2][2], arr[3][0],
@@ -723,8 +746,13 @@ class DnfService():
         # 判断销售价最早过期时间，如果低于19小时且总量大于阈值万，则-1
         mylog(self.dm, "不低于价格总量为：" + str(sum))
         if (sellh < 20 and sum > self.currentItem['c_price_min']):
-            sellPrice = int(sellPrice) - 1
-            mylog(self.dm, "目前销售价存量的最早过期时间为：" + str(sellh) + ",价格-1")
+
+            if (sum == data[0]['count1'] or data[0]['count1'] < 1000000 or (
+                    data[0]['count1'] + data[0]['count2']) < 1000000):  # 如果前面都是这个销售价的数据，则放弃-1，因为扫不到
+                mylog(self.dm, "目前销售存量基本都是销售价")
+            else:
+                sellPrice = int(sellPrice) - 1
+                mylog(self.dm, "目前销售价存量的最早过期时间为：" + str(sellh) + ",价格-1")
         else:
             mylog(self.dm, "目前销售价存量的最早过期时间为：" + str(sellh))
 
@@ -743,9 +771,9 @@ class DnfService():
         self.initWindow()
         self.dm.KeyPress(27)  # 重置一下
         time.sleep(0.1)
-        clickPic(self.dm, "dnfimg/首页弹窗关闭.bmp|dnfimg/关闭首页.bmp", 5, 0, 0, 0, 857, 880)
+        clickPic(self.dm, "dnfimg/关闭首页.bmp|dnfimg/首页弹窗关闭.bmp", 5, 0, 0, 0, 857, 880)
         MoveTo(self.dm, 511, 150)
         LeftClick(self.dm)
-        clickPic(self.dm, "dnfimg/关闭契约.bmp", 5, 0, 488,123,540,178)
         clickPic(self.dm, "dnfimg/关闭.bmp", 5, 0, 578, 103, 638, 144)
+        clickPic(self.dm, "dnfimg/关闭契约.bmp", 5, 0, 488, 123, 540, 178)
         clickPic(self.dm, "dnfimg/关闭拍卖行.bmp", 1, 0, 722, 27, 807, 60)

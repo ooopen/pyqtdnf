@@ -10,7 +10,7 @@ class DnfModel():
 
     def getConfig(self):
         query = (
-            "SELECT a.id as uid,a.idimg,b.*, c.c_price,c.c_price_min from dnf_ids a left join dnf_object b on a.gzone_id = b.gzone_id left join dnf_gzone c on c. id = a.gzone_id where a.status = 1")
+            "SELECT a.id as uid,a.idimg,b.*, c.c_price,c.c_price_min,c.sleep_num from dnf_ids a left join dnf_object b on a.gzone_id = b.gzone_id left join dnf_gzone c on c. id = a.gzone_id where a.status = 1")
         ret = self.db.execute(query)
         return ret
 

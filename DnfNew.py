@@ -1,3 +1,4 @@
+# encoding: utf-8
 import ctypes
 import inspect
 import random
@@ -40,6 +41,8 @@ class MainWindow(QWidget):
     checkPriceTime = 5 * 60  # 长时间没有试图购买，触发加价逻辑判断
 
     # 界面配置信息，先写死
+
+
 
     def __init__(self):
         super().__init__()
@@ -141,8 +144,6 @@ class MainWindow(QWidget):
                 self.stop()
                 mylog(self.model.dm, "5分钟没有试图扫拍，切换账号")
                 self.stop()
-                self.model.getMail()
-                self.model.upSell()
                 gl.set_value("exchangeIdThread", 1)
                 time.sleep(5)
 
@@ -210,7 +211,8 @@ class MainWindow(QWidget):
     def runThread(self, thread, target):
         mylog(self.model.dm, "begin " + target.__name__)
         if (thread != null and thread.is_alive()):
-            return thread  # 不重复开启线程
+            self._async_raise(thread.ident,SystemExit)
+            #return thread  # 不重复开启线程
         mylog(self.model.dm, target.__name__)
         thread = Thread(target=target, name=target.__name__,
                         args=()  # 元组

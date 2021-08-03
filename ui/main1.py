@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(400, 300)
+        Form.resize(833, 594)
         self.formLayoutWidget = QtWidgets.QWidget(Form)
         self.formLayoutWidget.setGeometry(QtCore.QRect(90, 40, 211, 141))
         self.formLayoutWidget.setObjectName("formLayoutWidget")
@@ -36,6 +36,9 @@ class Ui_Form(object):
         self.pushButton_3 = QtWidgets.QPushButton(Form)
         self.pushButton_3.setGeometry(QtCore.QRect(10, 150, 75, 30))
         self.pushButton_3.setObjectName("pushButton_3")
+        self.textBrowser = QtWidgets.QTextBrowser(Form)
+        self.textBrowser.setGeometry(QtCore.QRect(310, 10, 511, 581))
+        self.textBrowser.setObjectName("textBrowser")
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
